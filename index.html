@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>冲刺目标跟踪系统 · 2026 Q4</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ============ Design Tokens ============ */
+:root{
+  --red:#D9342B; --red-deep:#B0241C; --red-ink:#8C1D16; --red-soft:#FBEFED; --red-line:#F0CFCB;
+  --ink:#211C19; --ink-2:#5C544D; --muted:#8E847B;
+  --paper:#F6F3EF; --card:#FFFFFF; --line:#E7E0D8; --line-2:#D8CFC2;
+  --amber:#B97F16; --amber-soft:#FBF3E2; --amber-line:#EAD9B4;
+  --ok:#2E7D4F; --ok-soft:#E9F3EC;
+  --side:#201B18; --side-txt:#B9AFA5;
+  --radius:12px; --radius-sm:8px;
+  --shadow-card:0 1px 2px rgba(32,22,17,.05), 0 10px 28px -14px rgba(32,22,17,.22);
+  --font:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",sans-serif;
+  --mono:"SF Mono",ui-monospace,Menlo,Consolas,"PingFang SC",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--paper);color:var(--ink);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;font-size:14px;color:var(--ink)}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px;border-radius:4px}
+::placeholder{color:#B9AFA5}
+.ic{width:18px;height:18px;flex:none;vertical-align:-3.5px}
+
+/* ============ App Shell ============ */
+#app{display:grid;grid-template-columns:228px 1fr;height:100vh;overflow:hidden}
+.side{background:var(--side);color:var(--side-txt);display:flex;flex-direction:column;overflow-y:auto}
+.side-logo{display:flex;align-items:center;gap:10px;padding:20px 18px 16px}
+.side-logo .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#E2483D,#B0241C);display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
+.side-logo .mark .ic{width:19px;height:19px}
+.side-logo b{color:#fff;font-size:14.5px;display:block;line-height:1.3;letter-spacing:.5px}
+.side-logo i{font-style:normal;font-size:10px;letter-spacing:1.5px;color:#7A6F64;display:block}
+.nav-group{padding:10px 12px 2px}
+.nav-group>i{display:block;font-style:normal;font-size:10.5px;letter-spacing:2px;color:#6E645A;padding:0 10px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border-radius:9px;color:var(--side-txt);font-size:13.5px;text-align:left;position:relative;transition:background .15s,color .15s}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#EDE7E0}
+.nav-item.active{background:rgba(217,52,43,.18);color:#fff;font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:2px;background:var(--red)}
+.nav-item .bdg{margin-left:auto;background:var(--red);color:#fff;font-size:11px;font-weight:700;border-radius:99px;padding:0 7px;line-height:18px}
+.nav-item.locked{opacity:.38;cursor:not-allowed}
+.side-fill{flex:1;min-height:18px}
+.side-persona{border-top:1px solid rgba(255,255,255,.08);padding:14px 14px 16px}
+.side-persona>i{font-style:normal;display:block;font-size:10.5px;letter-spacing:2px;color:#6E645A;margin-bottom:9px}
+.persona{display:flex;align-items:center;gap:9px;width:100%;padding:7px 8px;border-radius:9px;color:var(--side-txt);font-size:13px;text-align:left;transition:background .15s,color .15s}
+.persona:hover{background:rgba(255,255,255,.06);color:#EDE7E0}
+.persona.on{background:rgba(255,255,255,.1);color:#fff}
+.persona .pv{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none}
+.persona.on .pv{background:var(--red)}
+.persona small{display:block;font-size:10.5px;color:#7A6F64;line-height:1.2}
+.persona.on small{color:#C9BFB4}
+.side-tools{display:flex;gap:8px;padding:0 14px 16px}
+.side-tools button{flex:1;font-size:11.5px;color:#7A6F64;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:5px 0;transition:color .15s,border-color .15s}
+.side-tools button:hover{color:#EDE7E0;border-color:rgba(255,255,255,.3)}
+
+.main{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:58px;flex:none;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 26px}
+.topbar h1{font-size:16.5px;font-weight:700;letter-spacing:.3px}
+.topbar .crumb{font-size:12px;color:var(--muted)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:3px 11px;white-space:nowrap}
+.chip.red{background:var(--red-soft);border-color:var(--red-line);color:var(--red-deep);font-weight:600}
+.chip .dot{width:6px;height:6px;border-radius:50%;background:var(--red)}
+.me{display:flex;align-items:center;gap:9px;padding:5px 12px 5px 6px;border:1px solid var(--line);border-radius:99px;background:var(--card)}
+.me .mv{width:27px;height:27px;border-radius:50%;background:var(--red);color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.me b{font-size:13px;display:block;line-height:1.25}
+.me small{font-size:10.5px;color:var(--muted);display:block;line-height:1.25}
+.content{flex:1;overflow-y:auto;padding:26px 30px 60px}
+.view{display:none;max-width:1280px;margin:0 auto}
+.view.on{display:block;animation:vin .25s ease}
+@keyframes vin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ============ Common ============ */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 2px rgba(32,22,17,.04)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:13.5px;font-weight:600;border-radius:9px;padding:9px 18px;background:var(--ink);color:#fff;transition:transform .12s,opacity .12s,background .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:none}
+.btn.red{background:var(--red)}
+.btn.red:hover{background:#C42D24}
+.btn.ghost{background:transparent;color:var(--ink-2);border:1px solid var(--line-2)}
+.btn.ghost:hover{border-color:var(--muted);color:var(--ink)}
+.btn.sm{padding:6px 13px;font-size:12.5px;border-radius:8px}
+.btn.xs{padding:3px 10px;font-size:12px;border-radius:7px;font-weight:500}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn.danger{background:transparent;color:var(--red-deep);border:1px solid var(--red-line)}
+.btn.danger:hover{background:var(--red-soft)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;border-radius:99px;padding:2px 10px;white-space:nowrap}
+.pill.draft{color:var(--muted);border:1px solid var(--line-2);background:var(--paper)}
+.pill.submitted{color:var(--amber);background:var(--amber-soft);border:1px solid var(--amber-line)}
+.pill.confirmed{color:#fff;background:var(--red-deep)}
+.pill.ok{color:var(--ok);background:var(--ok-soft);border:1px solid #CBE4D3}
+.pill .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.sec-label{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;margin-bottom:12px}
+.sec-label::before{content:'';width:8px;height:8px;border-radius:2.5px;background:var(--red)}
+.sec-label small{font-weight:400;color:var(--muted);font-size:11px;letter-spacing:1.5px}
+.field{margin-bottom:15px}
+.field>label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
+.field>label em{font-style:normal;color:var(--red);margin-left:2px}
+.ipt{width:100%;border:1px solid var(--line-2);border-radius:var(--radius-sm);padding:8.5px 12px;background:var(--card);transition:border-color .15s,box-shadow .15s}
+.ipt:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(217,52,43,.1);outline:none}
+.ipt:disabled{background:var(--paper);color:var(--muted);cursor:not-allowed}
+textarea.ipt{resize:vertical;line-height:1.7}
+.hint{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.5}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.banner{display:flex;gap:10px;align-items:flex-start;border-radius:var(--radius);padding:12px 16px;font-size:13px;margin-bottom:18px;border:1px solid}
+.banner .ic{margin-top:2px}
+.banner.amber{background:var(--amber-soft);border-color:var(--amber-line);color:#7A5510}
+.banner.ink{background:#EFEBE6;border-color:var(--line-2);color:var(--ink-2)}
+.banner.red{background:var(--red-soft);border-color:var(--red-line);color:var(--red-ink)}
+
+/* ============ 冲刺卡视图 ============ */
+.card-layout{display:grid;grid-template-columns:470px 1fr;gap:26px;align-items:start}
+.form-panel{padding:22px 24px}
+.seq-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seq-chip{display:flex;align-items:center;gap:9px;border:1px solid var(--line-2);border-radius:9px;padding:8px 10px;text-align:left;transition:all .15s;background:var(--card)}
+.seq-chip .ic{width:17px;height:17px;color:var(--muted)}
+.seq-chip b{display:block;font-size:12.5px;line-height:1.3}
+.seq-chip i{font-style:normal;display:block;font-size:10.5px;color:var(--muted);line-height:1.3}
+.seq-chip:hover{border-color:var(--muted)}
+.seq-chip.on{border-color:var(--red);background:var(--red-soft);box-shadow:0 0 0 1px var(--red) inset}
+.seq-chip.on .ic,.seq-chip.on b{color:var(--red-deep)}
+.path-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.path-row .no{width:24px;height:24px;flex:none;border-radius:7px;background:var(--paper);border:1px solid var(--line);font-size:11.5px;font-weight:700;color:var(--ink-2);display:flex;align-items:center;justify-content:center}
+.path-row .rm{width:26px;height:26px;flex:none;border-radius:7px;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.path-row .rm:hover{color:var(--red);background:var(--red-soft)}
+.path-row .rm .ic{width:14px;height:14px}
+.form-actions{display:flex;gap:10px;margin-top:20px;padding-top:18px;border-top:1px dashed var(--line-2)}
+
+.timeline{display:flex;align-items:flex-start;margin-bottom:18px}
+.tl-step{flex:1;text-align:center;position:relative}
+.tl-step .nd{width:26px;height:26px;border-radius:50%;border:2px solid var(--line-2);background:var(--card);color:var(--muted);display:flex;align-items:center;justify-content:center;margin:0 auto 7px;font-size:12px;font-weight:700;position:relative;z-index:1}
+.tl-step.done .nd{border-color:var(--red);background:var(--red);color:#fff}
+.tl-step.now .nd{border-color:var(--red);color:var(--red-deep);box-shadow:0 0 0 4px rgba(217,52,43,.12)}
+.tl-step b{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.tl-step.done b,.tl-step.now b{color:var(--ink)}
+.tl-step small{display:block;font-size:10.5px;color:var(--muted)}
+.tl-step::before{content:'';position:absolute;top:13px;left:-50%;width:100%;height:2px;background:var(--line-2)}
+.tl-step.done::before{background:var(--red)}
+.tl-step:first-child::before{display:none}
+
+.preview-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;position:sticky;top:0}
+.preview-tip{font-size:11.5px;color:var(--muted);letter-spacing:.5px}
+.export-row{display:flex;gap:10px}
+
+/* ============ 冲刺卡（实体卡片） ============ */
+.scard{width:460px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;position:relative;box-shadow:var(--shadow-card);font-size:14px}
+.sc-head{position:relative;color:#fff;padding:18px 22px 20px;background:linear-gradient(135deg,#DE3A2F 0%,#B7261C 78%);overflow:hidden}
+.sc-head::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.055) 0 10px,transparent 10px 20px);pointer-events:none}
+.sc-head-top{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:1.5px;opacity:.82;margin-bottom:10px;position:relative;z-index:1}
+.sc-head-main{display:flex;justify-content:space-between;align-items:flex-end;position:relative;z-index:1}
+.sc-title{font-size:29px;font-weight:900;letter-spacing:3px;line-height:1.15;text-shadow:0 2px 10px rgba(0,0,0,.14)}
+.sc-eng{font-size:10px;letter-spacing:5px;opacity:.75;margin-top:2px}
+.sc-seq{display:inline-flex;align-items:center;gap:6px;margin-top:11px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(2px);border-radius:99px;padding:3.5px 12px;font-size:12px;font-weight:600}
+.sc-seq .ic{width:14px;height:14px}
+.sc-seq i{font-style:normal;font-weight:400;opacity:.8;font-size:11px}
+.sc-bigq{font-size:62px;font-weight:900;line-height:.9;color:transparent;-webkit-text-stroke:1.6px rgba(255,255,255,.8);letter-spacing:-3px;font-style:italic}
+.sc-body{padding:20px 22px 18px}
+.sc-id{display:flex;align-items:center;gap:13px;padding-bottom:16px;border-bottom:1px dashed var(--line-2)}
+.sc-avatar{width:47px;height:47px;flex:none;border-radius:50%;background:var(--red-soft);border:1.5px solid var(--red-line);color:var(--red-deep);font-size:19px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.sc-id-main{flex:1;min-width:0}
+.sc-name{font-size:21px;font-weight:800;letter-spacing:1px;line-height:1.25}
+.sc-name .sc-code{font-size:11px;font-family:var(--mono);color:var(--muted);font-weight:400;margin-left:8px;letter-spacing:.5px}
+.sc-dept{font-size:12px;color:var(--ink-2);margin-top:1px}
+.sc-ok-tag{flex:none;align-self:flex-start;font-size:10.5px;font-weight:700;color:var(--red-deep);border:1px solid var(--red);border-radius:6px;padding:2px 8px;letter-spacing:2px;transform:rotate(3deg)}
+.sc-sec{margin-top:16px}
+.sc-sec-label{display:flex;align-items:baseline;gap:8px;margin-bottom:9px}
+.sc-sec-label::before{content:'';width:7px;height:7px;border-radius:2px;background:var(--red);align-self:center}
+.sc-sec-label b{font-size:13.5px;font-weight:800;letter-spacing:1px}
+.sc-sec-label span{font-size:9.5px;letter-spacing:3px;color:var(--muted)}
+.sc-goal{display:flex;gap:10px;padding:7px 0}
+.sc-goal .gno{font-size:17px;font-weight:900;color:var(--red);font-style:italic;line-height:1.35;flex:none;width:26px}
+.sc-goal p{font-size:13.5px;font-weight:600;line-height:1.55;color:var(--ink)}
+.sc-goal p em{font-style:normal;color:var(--red-deep)}
+.sc-path{position:relative;margin-left:3px}
+.sc-path::before{content:'';position:absolute;left:4.5px;top:8px;bottom:8px;width:1.5px;background:var(--line-2)}
+.sc-step{display:flex;gap:11px;padding:4.5px 0;position:relative}
+.sc-step .pd{width:10px;height:10px;flex:none;border-radius:50%;background:var(--red);border:2.5px solid #fff;box-shadow:0 0 0 1.5px var(--red);margin-top:5px}
+.sc-step p{font-size:12.5px;color:var(--ink-2);line-height:1.55;font-weight:500}
+.sc-sign{display:flex;margin-top:18px;border-top:1px dashed var(--line-2);padding-top:13px;gap:14px}
+.sc-sign-cell{flex:1}
+.sc-sign-cell span{display:block;font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-bottom:3px}
+.sc-sign-cell b{display:block;font-size:14.5px;font-weight:700;letter-spacing:2px}
+.sc-sign-cell b.pending{color:var(--amber);font-size:12px;font-weight:600;letter-spacing:.5px}
+.sc-sign-cell i{font-style:normal;font-size:10.5px;color:var(--muted);font-family:var(--mono)}
+.sc-foot{display:flex;align-items:center;justify-content:space-between;margin-top:15px;padding-top:12px;border-top:1px solid var(--line)}
+.sc-foot span{font-size:9.5px;letter-spacing:1.5px;color:var(--muted);font-family:var(--mono)}
+.sc-bar{width:118px;height:22px;background:repeating-linear-gradient(90deg,var(--ink) 0 1.5px,transparent 1.5px 4px,var(--ink) 4px 5.5px,transparent 5.5px 9px,var(--ink) 9px 12px,transparent 12px 14px);opacity:.75}
+.sc-seal{position:absolute;right:26px;top:56.5%;width:112px;height:112px;color:#C4271E;opacity:.94;transform:rotate(-13deg);pointer-events:none;mix-blend-mode:multiply}
+.scard.is-locked .sc-seal{animation:stamp .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes stamp{0%{transform:rotate(-13deg) scale(1.9);opacity:0}60%{opacity:.94}100%{transform:rotate(-13deg) scale(1)}}
+.scard.empty-state{border-style:dashed;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);min-height:560px;background:transparent}
+.scard.empty-state .ic{width:34px;height:34px;opacity:.5}
+
+/* ============ 看板视图 ============ */
+.dept-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.dtab{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:6px 14px;border-radius:99px;border:1px solid var(--line-2);background:var(--card);color:var(--ink-2);transition:all .15s}
+.dtab:hover{border-color:var(--muted)}
+.dtab.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.dtab.lock{opacity:.45;cursor:default}
+.dtab .dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.board-head{padding:20px 24px;display:flex;gap:22px;align-items:center;margin-bottom:16px}
+.board-head .bh-main{flex:1;min-width:0}
+.board-head h2{font-size:20px;font-weight:800;letter-spacing:.5px}
+.board-head .bh-sub{font-size:12.5px;color:var(--ink-2);margin-top:3px;display:flex;gap:14px;flex-wrap:wrap}
+.board-head .bh-sub b{color:var(--ink)}
+.ring{position:relative;width:92px;height:92px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring .rc{fill:none;stroke:var(--line);stroke-width:8}
+.ring .rv{fill:none;stroke:var(--red);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.ring .rt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .rt b{font-size:20px;font-weight:800;line-height:1}
+.ring .rt small{font-size:9.5px;color:var(--muted);letter-spacing:1px}
+.path-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.path-chip{font-size:11.5px;color:var(--ink-2);background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:3px 10px;display:inline-flex;gap:6px;align-items:center}
+.path-chip .ic{width:12px;height:12px;color:var(--red)}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.goal-card{padding:18px 20px}
+.goal-card .gc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px}
+.goal-card .gc-tag{font-size:10.5px;font-weight:700;letter-spacing:2px;color:var(--red-deep);background:var(--red-soft);border-radius:5px;padding:2px 8px;flex:none}
+.goal-card h3{font-size:14px;font-weight:700;line-height:1.5}
+.goal-card .gc-num{display:flex;align-items:baseline;gap:9px;margin:6px 0 10px}
+.goal-card .gc-num b{font-size:38px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.goal-card .gc-num .delta{font-size:12px;font-weight:700;border-radius:6px;padding:1px 8px}
+.delta.up{color:var(--ok);background:var(--ok-soft)}
+.delta.flat{color:var(--muted);background:var(--paper)}
+.gc-bar{height:9px;border-radius:99px;background:var(--paper);border:1px solid var(--line);position:relative;overflow:hidden}
+.gc-bar .fill{position:absolute;inset:0;width:0;border-radius:99px;background:linear-gradient(90deg,#E2483D,var(--red-deep));transition:width .6s ease}
+.gc-bar .tick{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--line-2)}
+.gc-note{margin-top:10px;font-size:12px;color:var(--ink-2);background:var(--paper);border-radius:8px;padding:8px 11px;line-height:1.6}
+.gc-note b{color:var(--ink);font-weight:600}
+.gc-spark{margin-top:10px;display:flex;align-items:flex-end;justify-content:space-between}
+.gc-spark small{font-size:10.5px;color:var(--muted)}
+.week-rail{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.wr-label{font-size:11.5px;color:var(--muted);margin-right:6px;letter-spacing:1px}
+.wk{width:42px;height:42px;border-radius:10px;border:1px solid var(--line-2);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--ink-2);transition:all .15s;position:relative;line-height:1.2}
+.wk b{font-weight:700;font-size:12px}
+.wk:hover{border-color:var(--muted)}
+.wk.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.wk.has::after{content:'';position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;background:var(--red)}
+.wk.on.has::after{background:#fff}
+.wk.cur::before{content:'本周';position:absolute;top:-17px;left:50%;transform:translateX(-50%);font-size:9.5px;color:var(--red-deep);font-weight:700;letter-spacing:1px}
+.wk:disabled{opacity:.32;cursor:not-allowed}
+.week-panel{padding:20px 24px}
+.wp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.wp-head h3{font-size:15px;font-weight:800}
+.wp-head small{color:var(--muted);font-size:11.5px;margin-left:9px;font-weight:400}
+.wp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.wp-goal{border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.wp-goal .wpg-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.wp-goal .wpg-top b{font-size:12.5px;line-height:1.45}
+.wp-goal .wpg-top span{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--red-deep)}
+.wp-goal p{font-size:11.5px;color:var(--muted)}
+.wp-note{margin-top:14px;border-top:1px dashed var(--line-2);padding-top:12px;font-size:13px;color:var(--ink-2);line-height:1.7}
+.wp-meta{margin-top:8px;font-size:11px;color:var(--muted)}
+.editor{border:2px solid var(--red);border-radius:var(--radius);padding:18px 20px;background:#FFFDFC}
+.editor h4{font-size:14px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.editor h4 .ic{color:var(--red)}
+.slider-row{display:grid;grid-template-columns:1fr 130px;gap:14px;align-items:center;margin-bottom:12px}
+.slider-row .sr-name{font-size:12.5px;font-weight:600;line-height:1.4}
+input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:99px;background:var(--line-2);outline-offset:6px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--red);border:3px solid #fff;box-shadow:0 1px 5px rgba(178,36,28,.5);cursor:grab}
+.sr-val{display:flex;align-items:center;gap:4px;justify-content:flex-end}
+.sr-val input{width:52px;border:1px solid var(--line-2);border-radius:7px;padding:4px 6px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.sr-val span{font-size:12px;color:var(--muted)}
+.editor-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+
+/* ============ 审核台 ============ */
+.sum-chips{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.sum-chip{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 18px}
+.sum-chip b{font-size:22px;font-weight:800;line-height:1}
+.sum-chip span{font-size:12px;color:var(--ink-2)}
+.sum-chip i{width:9px;height:9px;border-radius:3px;font-style:normal}
+.rev-list{display:flex;flex-direction:column;gap:10px}
+.rev-row{display:flex;align-items:center;gap:15px;padding:15px 20px}
+.rev-row .rv2{width:38px;height:38px;border-radius:50%;background:var(--paper);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--ink-2);flex:none}
+.rev-row .rmain{flex:1;min-width:0}
+.rev-row .rmain b{font-size:14.5px}
+.rev-row .rmain .rmeta{font-size:11.5px;color:var(--muted);display:flex;gap:12px;margin-top:2px;flex-wrap:wrap}
+.rev-row .rmeta .mono{font-family:var(--mono);letter-spacing:.5px}
+.rev-actions{display:flex;gap:8px;flex:none}
+.goal-peek{font-size:12px;color:var(--ink-2);max-width:420px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.goal-peek::before{content:'目标 · ';color:var(--red-deep);font-weight:600;font-size:11px}
+
+/* ============ BP总览 ============ */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.stat{padding:16px 20px}
+.stat .st-label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
+.stat .st-label .ic{width:14px;height:14px;color:var(--red)}
+.stat .st-num{font-size:30px;font-weight:800;line-height:1.2;margin-top:5px;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.stat .st-num small{font-size:13px;color:var(--muted);font-weight:500;letter-spacing:0}
+.stat .st-sub{font-size:11px;color:var(--muted)}
+.mini-bar{height:7px;border-radius:99px;background:var(--paper);border:1px solid var(--line);overflow:hidden;margin-top:9px}
+.mini-bar i{display:block;height:100%;background:linear-gradient(90deg,#E2483D,var(--red-deep));border-radius:99px}
+table.bp{width:100%;border-collapse:collapse}
+table.bp th{font-size:11.5px;color:var(--muted);text-align:left;font-weight:600;padding:11px 14px;border-bottom:1px solid var(--line);letter-spacing:.5px;white-space:nowrap}
+table.bp td{padding:13px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
+table.bp tr:last-child td{border-bottom:none}
+table.bp tr:hover td{background:#FBFAF8}
+td .mono{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.pb-cell{display:flex;align-items:center;gap:10px;min-width:150px}
+.pb-cell .mini-bar{flex:1;margin:0}
+.pb-cell span{font-size:12px;font-variant-numeric:tabular-nums;color:var(--ink-2);white-space:nowrap}
+
+/* ============ Modal / Toast ============ */
+#modal-root{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(26,19,15,.5);backdrop-filter:blur(3px);z-index:100;padding:24px}
+#modal-root.on{display:flex}
+.modal{background:var(--card);border-radius:16px;max-width:92vw;max-height:88vh;overflow:auto;box-shadow:0 24px 70px -20px rgba(26,19,15,.5);animation:min .22s ease}
+@keyframes min{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.modal-pad{padding:24px 26px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card);z-index:2}
+.modal-head h3{font-size:15.5px;font-weight:800}
+.modal-head .x{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.modal-head .x:hover{background:var(--paper);color:var(--ink)}
+.modal-card-zone{display:flex;justify-content:center;padding:22px;background:linear-gradient(180deg,#F1EDE7,#F6F3EF)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;padding:16px 24px;border-top:1px solid var(--line)}
+.matrix{width:100%;border-collapse:collapse;font-size:12.5px}
+.matrix th,.matrix td{border:1px solid var(--line);padding:9px 12px;text-align:center}
+.matrix th{background:var(--paper);font-size:12px}
+.matrix td:first-child{text-align:left;font-weight:600;background:#FBFAF8;white-space:nowrap}
+.matrix .y{color:var(--ok);font-weight:700}
+.matrix .n{color:#C9BFB4}
+.matrix .p{color:var(--amber);font-weight:600;font-size:11.5px}
+.guide{counter-reset:g}
+.guide li{list-style:none;position:relative;padding:7px 0 7px 34px;font-size:13.5px;color:var(--ink-2);border-bottom:1px dashed var(--line)}
+.guide li:last-child{border:none}
+.guide li::before{counter-increment:g;content:counter(g,decimal-leading-zero);position:absolute;left:0;top:8px;font-size:12px;font-weight:800;color:var(--red);font-style:italic}
+.guide b{color:var(--ink)}
+#toast-root{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{display:flex;align-items:center;gap:9px;background:var(--ink);color:#fff;font-size:13px;border-radius:99px;padding:9px 20px;box-shadow:0 10px 30px -8px rgba(26,19,15,.5);animation:tin .3s ease}
+.toast .ic{width:15px;height:15px;color:#7FD9A3}
+.toast.warn .ic{color:#F2C063}
+@keyframes tin{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+
+/* ============ Print ============ */
+#printMount{display:none}
+@media print{
+  @page{size:A4;margin:14mm}
+  body.printing #app{display:none!important}
+  body.printing #modal-root,body.printing #toast-root{display:none!important}
+  body.printing #printMount{display:flex!important;justify-content:center}
+  body.printing #printMount .scard{box-shadow:none;border:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:1120px){
+  #app{grid-template-columns:64px 1fr}
+  .side-logo b,.side-logo i,.nav-group>i,.nav-item span,.nav-item .bdg,.side-persona>i,.persona small,.side-tools{display:none}
+  .nav-item{justify-content:center;padding:11px 0}
+  .persona{justify-content:center;padding:8px 0}
+  .card-layout{grid-template-columns:1fr}
+  .preview-wrap{position:static}
+  .goal-grid,.wp-grid{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside class="side">
+    <div class="side-logo">
+      <div class="mark" id="logo-mark"></div>
+      <div><b>冲刺目标跟踪</b><i>SPRINT TRACKER</i></div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="side-fill"></div>
+    <div class="side-persona">
+      <i>演示身份切换</i>
+      <div id="persona-list"></div>
+    </div>
+    <div class="side-tools">
+      <button onclick="App.openPerm()">权限说明</button>
+      <button onclick="App.openGuide()">原型说明</button>
+      <button onclick="App.reset()">重置</button>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar" id="topbar"></header>
+    <div class="content">
+      <section class="view" id="view-card"></section>
+      <section class="view" id="view-board"></section>
+      <section class="view" id="view-review"></section>
+      <section class="view" id="view-bp"></section>
+    </div>
+  </main>
+</div>
+<div id="modal-root" onclick="if(event.target===this)App.closeModal()"></div>
+<div id="toast-root"></div>
+<div id="printMount"></div>
+
+<script>
+/* ================================================================
+   冲刺目标跟踪系统 · 高保真交互原型（无后端，数据存于内存+localStorage）
+   角色权限：
+     员工    —— 填写本人冲刺卡；仅查看本部门看板
+     部门负责人 —— 审核锁定成员目标卡；填写部门目标；每周更新进度
+     BP/人力  —— 全公司确认率统计、提醒、全部看板只读
+================================================================ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+/* ---------- 图标库（线性 SVG） ---------- */
+const ICONS={
+flag:'<path d="M5 21V4c3-2.2 6 2 9 0 2-1.5 4-1 5-.5V13c-1-.5-3-1-5 .5-3 2-6-2.2-9 0"/>',
+card:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18"/><path d="M7 15h4"/>',
+board:'<rect x="3" y="3" width="18" height="18" rx="2.5"/><path d="M9 3v18"/><path d="M15 3v9"/>',
+shield:'<path d="M12 22s8-3.6 8-10V5.5L12 2 4 5.5V12c0 6.4 8 10 8 10z"/><path d="M8.8 11.6l2.2 2.2 4.2-4.2"/>',
+chart:'<path d="M4 20h17"/><path d="M6 20v-6"/><path d="M11 20V7"/><path d="M16 20v-9"/><path d="M21 20V4"/>',
+lock:'<rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 018 0V11"/>',
+edit:'<path d="M16.8 3.8l3.4 3.4L8 19.4l-4.6 1.2 1.2-4.6L16.8 3.8z"/>',
+down:'<path d="M12 3v12"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M4 20h16"/>',
+print:'<path d="M6.5 9V3.5h11V9"/><path d="M6.5 17.5H5a2 2 0 01-2-2v-4.5a2 2 0 012-2h14a2 2 0 012 2v4.5a2 2 0 01-2 2h-1.5"/><path d="M6.5 14.5h11v6h-11z"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',
+trash:'<path d="M4 6.5h16"/><path d="M9 6.5V4h6v2.5"/><path d="M6.5 6.5l1 14h9l1-14"/><path d="M10 10.5v6M14 10.5v6"/>',
+x:'<path d="M6 6l12 12M18 6L6 18"/>',
+bell:'<path d="M18 8.5a6 6 0 10-12 0c0 6.5-2.5 8-2.5 8h17s-2.5-1.5-2.5-8"/><path d="M10.3 20.5a2 2 0 003.4 0"/>',
+eye:'<path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.6"/>',
+gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>',
+target:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>',
+heart:'<path d="M12 20.2S4.4 15.6 2.9 10.8a4.9 4.9 0 019.1-2.6 4.9 4.9 0 019.1 2.6C19.6 15.6 12 20.2 12 20.2z"/>',
+trend:'<path d="M3 17.5l6-6 4 4 8-8.5"/><path d="M15 7h6v6"/>',
+doc:'<path d="M6 2.5h8.5L20 8v13.5H6z"/><path d="M14 2.5V8h6"/><path d="M9.5 13h6M9.5 17h6"/>',
+users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-5.7 6.5-5.7s6.5 2.1 6.5 5.7"/><path d="M16 4.6a3.5 3.5 0 010 6.8"/><path d="M19 20c0-2.9-1.4-4.8-3.5-5.6"/>',
+yen:'<circle cx="12" cy="12" r="8.5"/><path d="M8.5 7.5L12 12l3.5-4.5"/><path d="M12 12v5.5"/><path d="M9 13.5h6M9 16h6"/>',
+mega:'<path d="M3 10.5v3a1 1 0 001 1h2.5l6 4.5v-14l-6 4.5H4a1 1 0 00-1 1z"/><path d="M16 9.2a4.2 4.2 0 010 5.6"/>',
+funnel:'<path d="M3.5 4.5h17l-6.5 7.8v6.2l-4 2v-8.2L3.5 4.5z"/>',
+grid:'<rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.5"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.5"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.5"/><rect x="13" y="13" width="7.5" height="7.5" rx="1.5"/>',
+back:'<path d="M9 15l-4-5 4-5"/><path d="M5 10h9a5 5 0 015 5v1"/>',
+info:'<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><path d="M12 7.8v.4"/>',
+cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/>',
+refresh:'<path d="M20.5 12a8.5 8.5 0 11-2.5-6L20.5 8"/><path d="M20.5 3v5h-5"/>',
+send:'<path d="M21 3L10.5 13.5"/><path d="M21 3l-6.8 18-3.7-7.5L3 9.8 21 3z"/>'
+};
+const ic=(n,st='')=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ${st?`style="${st}"`:''}>${ICONS[n]||ICONS.info}</svg>`;
+
+/* ---------- 序列模板 ---------- */
+const SEQ=[
+ {id:'impl',  name:'实施序列', sub:'项目进度 · 权责', icon:'gear',   hint:'例：重点项目按期交付率 100%、验收回款 ¥500 万、权责落实到人'},
+ {id:'bizdev',name:'客开序列', sub:'新客突破',        icon:'target', hint:'例：新客签约 8 家、商机储备 ¥2000 万、打造标杆客户 2 个'},
+ {id:'cs',    name:'客户成功', sub:'续费 · 增购',     icon:'heart',  hint:'例：续费率 ≥90%、增购金额 ¥150 万、NPS ≥45'},
+ {id:'sales', name:'销售',     sub:'签约 · 回款',     icon:'trend',  hint:'例：签约 ¥800 万、回款率 95%、新客户 6 家'},
+ {id:'pre',   name:'售前',     sub:'方案 · 赢单',     icon:'doc',    hint:'例：支持方案 25 单、关键赢单率提升 10%、沉淀标杆方案 3 个'},
+ {id:'hr',    name:'人力',     sub:'组织 · 人效',     icon:'users',  hint:'例：关键岗位到岗率 100%、核心人才保留 ≥95%、人均培训 40h'},
+ {id:'fin',   name:'财务',     sub:'预算 · 应收',     icon:'yen',    hint:'例：应收周转 ≤45 天、预算偏差 ≤5%、月结 T+3 出报表'},
+ {id:'mkt',   name:'市场',     sub:'线索 · 品牌',     icon:'mega',   hint:'例：有效线索 300 条、市场活动 ROI ≥3、品牌曝光 500 万'},
+ {id:'sm',    name:'销管',     sub:'商机 · 合规',     icon:'funnel', hint:'例：商机转化率 25%、销售流程合规 100%、数据及时准确率 98%'},
+ {id:'pmo',   name:'PMO',      sub:'里程碑 · 效率',   icon:'grid',   hint:'例：里程碑达成率 95%、交付周期缩短 10%、项目复盘覆盖 100%'},
+];
+const seqOf=id=>SEQ.find(s=>s.id===id)||SEQ[0];
+
+/* ---------- 季度 ---------- */
+const Q={year:2026,label:'2026 第四季度',current:2,
+ weeks:[1,2,3,4,5,6,7,8,9,10,11,12,13].map(n=>({n,range:['10.01–10.09','10.10–10.16','10.17–10.23','10.24–10.30','10.31–11.06','11.07–11.13','11.14–11.20','11.21–11.27','11.28–12.04','12.05–12.11','12.12–12.18','12.19–12.25','12.26–12.31'][n-1]}))};
+
+/* ---------- 人员与目标卡数据 ---------- */
+const DB={
+ people:{
+  zm:{id:'zm',name:'张明',code:'EMP0231',dept:'实施交付部',deptId:'impl',role:'employee',roleName:'部门员工'},
+  lq:{id:'lq',name:'李强',code:'EMP0102',dept:'实施交付部',deptId:'impl',role:'head',roleName:'部门负责人'},
+  wf:{id:'wf',name:'王芳',code:'EMP0017',dept:'人力资源部',deptId:'hr',role:'bp',roleName:'HRBP'},
+ },
+ cards:{
+  zm:{name:'张明',code:'EMP0231',dept:'实施交付部',seq:'impl',status:'draft',
+      goals:'重点项目按期交付率 100%（3 个项目）\n季度推动验收回款 ¥500 万，权责落实到人',
+      path:['里程碑倒排，周例会跟踪风险','交付物模板化，验收标准前置对齐','回款节点与客户双周沟通对账','问题升级 24 小时响应机制'],savedAt:'10.08 14:20'},
+  lq:{name:'李强',code:'EMP0102',dept:'实施交付部',seq:'impl',status:'confirmed',
+      goals:'部门人均交付效率提升 15%\n季度项目按期率 100%、零重大权责事故',
+      path:['推行项目看板周更机制','关键节点亲自把关','每月一次交付复盘'],submittedAt:'10.09',confirmedAt:'10.10',confirmedBy:'王芳（上级）'},
+  wf:{name:'王芳',code:'EMP0017',dept:'人力资源部',seq:'hr',status:'draft',goals:'',path:[''],savedAt:''},
+  cc:{name:'陈晨',code:'EMP0245',dept:'实施交付部',seq:'impl',status:'submitted',
+      goals:'B 项目设计评审一次通过\n交付物模板复用率提升至 60%',
+      path:['评审前内部预审两轮','沉淀标准交付物模板库'],submittedAt:'10.14'},
+  zk:{name:'周凯',code:'EMP0233',dept:'实施交付部',seq:'impl',status:'submitted',
+      goals:'C 项目里程碑偏差 ≤3 天\n客户满意度 ≥4.6 / 5',
+      path:['里程碑预警提前 5 天','每月客户满意度回访'],submittedAt:'10.15'},
+  ly:{name:'刘洋',code:'EMP0219',dept:'实施交付部',seq:'impl',status:'confirmed',
+      goals:'A 项目 11.30 前按期验收\n负责项目零安全、零延期事故',
+      path:['验收标准月初对齐','每周五向客户同步进度'],submittedAt:'10.09',confirmedAt:'10.12',confirmedBy:'李强'},
+  zx:{name:'赵雪',code:'EMP0258',dept:'实施交付部',seq:'impl',status:'blank',goals:'',path:['']},
+ },
+ team:['zm','cc','zk','ly','zx'], // 实施交付部成员（李强本人除外）
+ depts:[
+  {id:'impl',name:'实施交付部',head:'李强',hasBoard:true,
+   goals:['3 个重点项目按期交付，按期率 100%','季度验收回款 ¥500 万'],
+   path:['里程碑倒排，周例会跟踪风险','验收标准前置对齐，交付物模板化','回款节点双周对账，权责到人'],
+   weeks:{1:{pct:[15,10],note:'项目启动会完成，三个项目里程碑倒排全部落地，责任到人。',at:'10.09',by:'李强'},
+          2:{pct:[32,25],note:'A 项目设计评审通过；首笔回款 ¥125 万到账，剩余按节点推进。',at:'10.16',by:'李强'}},
+   stats:{t:6,c:2},lastAt:'10.16'},
+  {id:'bizdev',name:'客户开发部',head:'马斌',hasBoard:false,goals:[],path:[],weeks:{},stats:{t:8,c:6},lastAt:'—'},
+  {id:'cs',name:'客户成功部',head:'钱佳',hasBoard:false,goals:[],path:[],weeks:{},stats:{t:6,c:5},lastAt:'—'},
+  {id:'sales',name:'销售部',head:'孙浩',hasBoard:true,
+   goals:['Q4 签约金额 ¥3000 万','新客户签约 8 家'],
+   path:['大客户攻坚周会','渠道伙伴联合打单','老客户增购专项'],
+   weeks:{1:{pct:[12,25],note:'季度启动，商机盘点完成，锁定 3 个千万级机会点。',at:'10.09',by:'孙浩'}},stats:{t:12,c:9},lastAt:'10.09'},
+  {id:'pre',name:'售前部',head:'吴敏',hasBoard:true,
+   goals:['支持售前方案 40 单','关键项目赢单率 ≥45%'],
+   path:['方案模板库月度迭代','标杆案例复盘输出'],
+   weeks:{1:{pct:[20,15],note:'方案模板库 v3.0 发布，已支撑 8 个商机。',at:'10.10',by:'吴敏'}},stats:{t:7,c:4},lastAt:'10.10'},
+  {id:'hr',name:'人力资源部',head:'郑洁',hasBoard:false,goals:[],path:[],weeks:{},stats:{t:4,c:4},lastAt:'—'},
+  {id:'fin',name:'财务部',head:'何静',hasBoard:false,goals:[],path:[],weeks:{},stats:{t:3,c:3},lastAt:'—'},
+  {id:'mkt',name:'市场部',head:'冯睿',hasBoard:false,goals:[],path:[],weeks:{},stats:{t:5,c:2},lastAt:'—'},
+  {id:'sm',name:'销售管理部',head:'高翔',hasBoard:false,goals:[],path:[],weeks:{},stats:{t:3,c:2},lastAt:'—'},
+  {id:'pmo',name:'PMO',head:'罗兰',hasBoard:false,goals:[],path:[],weeks:{},stats:{t:2,c:1},lastAt:'—'},
+ ]
+};
+
+/* ---------- 运行状态 ---------- */
+const S={route:'card',persona:'zm',selDept:'impl',selWeek:Q.current,editWeek:false,editDept:false};
+
+/* ---------- 持久化 ---------- */
+const LSKEY='sprint-proto-v1';
+function save(){try{localStorage.setItem(LSKEY,JSON.stringify({cards:DB.cards,depts:DB.depts.map(d=>({id:d.id,head:d.head,goals:d.goals,path:d.path,weeks:d.weeks,hasBoard:d.hasBoard,lastAt:d.lastAt}))}))}catch(e){}}
+function load(){try{const j=JSON.parse(localStorage.getItem(LSKEY)||'null');if(!j)return;Object.assign(DB.cards,j.cards||{});(j.depts||[]).forEach(sd=>{const d=DB.depts.find(x=>x.id===sd.id);if(d)Object.assign(d,sd)})}catch(e){}}
+
+/* ---------- 工具 ---------- */
+const person=()=>DB.people[S.persona];
+const myCard=()=>DB.cards[S.persona];
+const goalsOf=c=>String(c.goals||'').split('\n').map(s=>s.trim()).filter(Boolean);
+const pathsOf=c=>(c.path||[]).map(s=>s.trim()).filter(Boolean);
+const deptOf=id=>DB.depts.find(d=>d.id===id);
+const latestPct=(d,w,gi)=>{for(let k=w;k>=1;k--){if(d.weeks[k])return d.weeks[k].pct[gi]??0}return 0};
+const hasData=(d,w)=>!!d.weeks[w];
+const fmtW=n=>`第 ${n} 周`;
+function toast(msg,warn){const t=document.createElement('div');t.className='toast'+(warn?' warn':'');t.innerHTML=`${ic(warn?'bell':'shield')}${esc(msg)}`;$('#toast-root').appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),320)},2600)}
+
+/* ---------- 权限 ---------- */
+const PERM={
+ canEditCard:()=>{const c=myCard();return c.status==='draft'},
+ canSubmit:()=>myCard().status==='draft',
+ canReview:()=>person().role==='head',
+ canBP:()=>person().role==='bp',
+ canEditBoard:d=>person().role==='head'&&person().deptId===d.id,
+ visibleDepts:()=>{const p=person();if(p.role==='employee')return DB.depts.filter(d=>d.id===p.deptId);return DB.depts},
+ canSwitchDept:d=>{const p=person();return p.role!=='employee'||d.id===p.deptId},
+};
+
+/* ============ 冲刺卡（实体卡片渲染） ============ */
+function sealSVG(date){return `
+<svg class="sc-seal" viewBox="0 0 120 120">
+  <defs><path id="sealc" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/></defs>
+  <circle cx="60" cy="60" r="55.5" fill="none" stroke="currentColor" stroke-width="3.2"/>
+  <circle cx="60" cy="60" r="39" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <text font-size="11" letter-spacing="2.5" fill="currentColor" font-weight="600"><textPath href="#sealc" startOffset="2%">部门负责人已审核确认 · 锁定</textPath></text>
+  <path d="M60 36l2.1 4.3 4.7.6-3.4 3.3.8 4.7-4.2-2.2-4.2 2.2.8-4.7-3.4-3.3 4.7-.6z" fill="currentColor"/>
+  <text x="60" y="63" text-anchor="middle" font-size="19" font-weight="800" fill="currentColor" letter-spacing="2">已确认</text>
+  <text x="60" y="78" text-anchor="middle" font-size="9" fill="currentColor" letter-spacing="1">${esc(date||'')}</text>
+</svg>`}
+
+function cardHTML(pid,uid){
+  const c=DB.cards[pid];if(!c)return'';
+  if(c.status==='blank'||(!goalsOf(c).length&&!pathsOf(c).length&&c.status==='draft'&&!c.savedAt))
+    return `<div class="scard empty-state">${ic('edit')}<b style="font-size:14px">尚未填写冲刺目标卡</b><span style="font-size:12px">选择序列后开始填写，完成后即可提交确认</span></div>`;
+  const seq=seqOf(c.seq);
+  const goals=goalsOf(c);const paths=pathsOf(c);
+  return `
+  <div class="scard ${c.status==='confirmed'?'is-locked':''}" id="scard-${uid}">
+    <div class="sc-head">
+      <div class="sc-head-top"><span>2026 · 第四季度</span><span>冲刺周期 10.01 – 12.31</span></div>
+      <div class="sc-head-main">
+        <div>
+          <div class="sc-title">冲刺目标卡</div>
+          <div class="sc-eng">SPRINT GOAL CARD</div>
+          <div class="sc-seq">${ic(seq.icon)}${seq.name}<i>· ${seq.sub}</i></div>
+        </div>
+        <div class="sc-bigq">Q4</div>
+      </div>
+    </div>
+    <div class="sc-body">
+      <div class="sc-id">
+        <div class="sc-avatar">${esc((c.name||'·')[0])}</div>
+        <div class="sc-id-main">
+          <div class="sc-name">${esc(c.name||'')}<span class="sc-code">${esc(c.code||'')}</span></div>
+          <div class="sc-dept">${esc(c.dept||'')} · ${seq.name}</div>
+        </div>
+        ${c.status==='confirmed'?'<div class="sc-ok-tag">CONFIRMED</div>':''}
+      </div>
+      <div class="sc-sec">
+        <div class="sc-sec-label"><b>本季冲刺目标</b><span>GOALS</span></div>
+        ${goals.length?goals.map((g,i)=>`<div class="sc-goal"><div class="gno">${String(i+1).padStart(2,'0')}</div><p>${esc(g)}</p></div>`).join(''):'<div class="sc-goal"><div class="gno">01</div><p style="color:var(--muted)">待填写</p></div>'}
+      </div>
+      <div class="sc-sec">
+        <div class="sc-sec-label"><b>实施路径</b><span>PATH</span></div>
+        <div class="sc-path">
+          ${paths.length?paths.map(p=>`<div class="sc-step"><div class="pd"></div><p>${esc(p)}</p></div>`).join(''):'<div class="sc-step"><div class="pd"></div><p style="color:var(--muted)">待填写</p></div>'}
+        </div>
+      </div>
+      <div class="sc-sign">
+        <div class="sc-sign-cell"><span>员工确认 / EMPLOYEE</span><b>${esc(c.name||'—')}</b><i>${c.submittedAt||'待提交'}</i></div>
+        <div class="sc-sign-cell"><span>部门负责人审核 / LEAD</span><b class="${c.status==='confirmed'?'':'pending'}">${c.status==='confirmed'?esc(c.confirmedBy||'负责人'):'待一对一确认'}</b><i>${c.confirmedAt||'—'}</i></div>
+      </div>
+      <div class="sc-foot"><span>${esc(c.code||'')} · Q4-2026 · SPRINT TRACKER</span><div class="sc-bar"></div></div>
+    </div>
+    ${c.status==='confirmed'?sealSVG(c.confirmedAt):''}
+  </div>`;
+}
+
+/* ============ 视图：我的冲刺卡 ============ */
+function renderCardView(){
+  const c=myCard();const p=person();const seq=seqOf(c.seq);
+  const editable=PERM.canEditCard();
+  const tl=[
+    {k:'draft',t:'填写目标卡',s:'选择序列 · 填写目标与路径',on:c.status==='draft',done:c.status!=='draft'},
+    {k:'sub',t:'一对一确认',s:'提交后与负责人当面确认',on:c.status==='submitted',done:c.status==='confirmed'},
+    {k:'ok',t:'负责人审核锁定',s:'确认后不可修改，可导出',on:c.status==='confirmed',done:c.status==='confirmed'},
+  ];
+  let banner='';
+  if(c.status==='submitted')banner=`<div class="banner amber">${ic('bell')}<div><b>已提交，等待部门负责人一对一确认。</b>确认通过后目标卡将锁定，不可再修改；如需调整，请负责人退回后重新填写。</div></div>`;
+  if(c.status==='confirmed')banner=`<div class="banner ink">${ic('lock')}<div><b>目标卡已确认锁定，不可修改。</b>可随时导出图片或打印留存；季度末将作为冲刺复盘依据。</div></div>`;
+
+  $('#view-card').innerHTML=`
+  <div style="margin-bottom:16px">
+    <div class="sec-label">我的冲刺目标卡 <small>MY SPRINT CARD · ${esc(p.dept)}</small></div>
+    <div class="timeline">
+      ${tl.map((s,i)=>`<div class="tl-step ${s.done?'done':''} ${s.on?'now':''}"><div class="nd">${s.done?'✓':i+1}</div><b>${s.t}</b><small>${s.s}</small></div>`).join('')}
+    </div>
+    ${banner}
+  </div>
+  <div class="card-layout">
+    <div class="panel form-panel">
+      <div class="field">
+        <label>选择序列 <em>*</em></label>
+        <div class="seq-grid">
+          ${SEQ.map(s=>`<button class="seq-chip ${c.seq===s.id?'on':''}" ${editable?`onclick="App.pickSeq('${s.id}')"`:'disabled style="opacity:.55;cursor:not-allowed"'}>${ic(s.icon)}<div><b>${s.name}</b><i>${s.sub}</i></div></button>`).join('')}
+        </div>
+        <div class="hint">${ic('info','width:12px;height:12px;vertical-align:-2px;color:var(--red)')} ${esc(seq.hint)}</div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>姓名 <em>*</em></label><input class="ipt" id="f-name" value="${esc(c.name)}" ${editable?'':'disabled'} oninput="App.onFormInput()"></div>
+        <div class="field"><label>员工编码 <em>*</em></label><input class="ipt" id="f-code" value="${esc(c.code)}" ${editable?'':'disabled'} oninput="App.onFormInput()"></div>
+      </div>
+      <div class="field"><label>部门 <em>*</em></label><input class="ipt" id="f-dept" value="${esc(c.dept)}" ${editable?'':'disabled'} oninput="App.onFormInput()"></div>
+      <div class="field">
+        <label>本季冲刺目标 <em>*</em> <span style="font-weight:400;color:var(--muted);font-size:11.5px">（每行一个目标，建议 1–3 个）</span></label>
+        <textarea class="ipt" id="f-goals" rows="3" ${editable?'':'disabled'} oninput="App.onFormInput()" placeholder="${esc(seq.hint)}">${esc(c.goals)}</textarea>
+      </div>
+      <div class="field">
+        <label>实施路径 <em>*</em> <span style="font-weight:400;color:var(--muted);font-size:11.5px">（达成目标的关键动作，按顺序排列）</span></label>
+        <div id="path-list">
+          ${(c.path&&c.path.length?c.path:['']).map((v,i)=>`
+          <div class="path-row"><div class="no">${i+1}</div>
+            <input class="ipt path-input" value="${esc(v)}" ${editable?'':'disabled'} oninput="App.onFormInput()" placeholder="例：里程碑倒排，周例会跟踪风险">
+            ${editable?`<button class="rm" title="删除" onclick="App.rmPath(${i})">${ic('trash')}</button>`:''}
+          </div>`).join('')}
+        </div>
+        ${editable?`<button class="btn ghost sm" style="margin-top:4px" onclick="App.addPath()">${ic('plus')} 添加路径</button>`:''}
+        ${c.savedAt?`<div class="hint">最近保存：${esc(c.savedAt)}</div>`:''}
+      </div>
+      <div class="form-actions">
+        ${c.status==='draft'?`<button class="btn ghost" onclick="App.saveDraft()">${ic('edit')} 保存草稿</button>
+        <button class="btn red" onclick="App.submitCard()">${ic('send')} 提交负责人确认</button>`:
+        c.status==='submitted'?`<button class="btn" disabled>${ic('lock')} 已提交 · 待确认</button>`:
+        `<button class="btn" disabled>${ic('lock')} 已锁定 · 不可修改</button>`}
+      </div>
+    </div>
+    <div class="preview-wrap">
+      <div class="preview-tip">目标卡实时预览 · EXPORTABLE</div>
+      <div id="card-preview">${cardHTML(S.persona,'me')}</div>
+      <div class="export-row">
+        <button class="btn ghost" onclick="App.exportPNG('me')">${ic('down')} 导出图片</button>
+        <button class="btn ghost" onclick="App.printCard('me')">${ic('print')} 打印 / PDF</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============ 视图：部门看板 ============ */
+function sparkSVG(vals){
+  const w=120,h=30,n=Math.max(vals.length,2);
+  const pts=vals.map((v,i)=>`${(i/(n-1))*w},${h-2-(v/100)*(h-6)}`).join(' ');
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts}" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${w}" cy="${h-2-(vals[vals.length-1]/100)*(h-6)}" r="2.6" fill="var(--red)"/></svg>`;
+}
+function renderBoard(){
+  const p=person();
+  const canSee=PERM.visibleDepts();
+  const d=deptOf(S.selDept)||canSee[0];
+  if(!d){$('#view-board').innerHTML='<div class="panel">暂无可见部门</div>';return}
+  S.selDept=d.id;
+  const editable=PERM.canEditBoard(d);
+  let permBanner='';
+  if(p.role==='employee')permBanner=`<div class="banner ink">${ic('eye')}<div><b>只读视图。</b>你是部门员工，仅可查看本部门（${esc(p.dept)}）的目标进度看板。${d.id!==p.deptId?'当前部门无权查看。':''}</div></div>`;
+  else if(p.role==='bp')permBanner=`<div class="banner ink">${ic('eye')}<div><b>只读视图（BP 权限）。</b>可查看全部部门看板进度，不可填写；可在 BP 总览中发送提醒。</div></div>`;
+  else permBanner=`<div class="banner red">${ic('edit')}<div><b>负责人视图。</b>你可以更新本部门每周进度、维护部门目标。</div></div>`;
+
+  let inner='';
+  if(!d.hasBoard){
+    inner=`<div class="panel" style="padding:56px 30px;text-align:center;color:var(--muted)">
+      ${ic('board','width:34px;height:34px;opacity:.45')}
+      <div style="font-size:15px;font-weight:700;color:var(--ink-2);margin-top:10px">该部门看板尚未开设</div>
+      <div style="font-size:12.5px;margin-top:4px">部门负责人填写「部门 · 负责人 · 目标1 · 目标2 · 路径」后自动生成${editable?'，你现在就可以 <a href="#" onclick="App.editDept();return false" style="color:var(--red-deep);font-weight:600">设置部门目标</a>':''}</div>
+    </div>`;
+  }else{
+    const wk=Q.weeks.find(w=>w.n===S.selWeek);
+    const overall=Math.round((latestPct(d,S.selWeek,0)+latestPct(d,S.selWeek,1))/2);
+    const C=2*Math.PI*38;
+    const editableWeek=editable&&S.selWeek<=Q.current;
+    const wd=d.weeks[S.selWeek];
+    inner=`
+    <div class="panel board-head">
+      <div class="bh-main">
+        <h2>${esc(d.name)} · 目标进度看板</h2>
+        <div class="bh-sub"><span>负责人 <b>${esc(d.head)}</b></span><span>${Q.label}</span><span>更新至 <b>${esc(d.lastAt)}</b></span></div>
+        <div class="path-chips">${(d.path||[]).map(x=>`<span class="path-chip">${ic('back')}${esc(x)}</span>`).join('')}</div>
+        ${editable?`<div style="margin-top:13px;display:flex;gap:9px">
+          <button class="btn ghost sm" onclick="App.editDept()">${ic('edit')} 部门目标设置</button>
+          ${S.editWeek?`<button class="btn ghost sm" onclick="App.cancelWeekEdit()">收起编辑</button>`:''}
+        </div>`:''}
+      </div>
+      <div class="ring">
+        <svg width="92" height="92"><circle class="rc" cx="46" cy="46" r="38"/><circle class="rv" cx="46" cy="46" r="38" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-overall/100)}"/></svg>
+        <div class="rt"><b>${overall}%</b><small>整体进度</small></div>
+      </div>
+    </div>
+    <div class="goal-grid">
+      ${(d.goals||[]).map((g,gi)=>{
+        const cur=latestPct(d,S.selWeek,gi),prev=gi===0?0:0;
+        const before=latestPct(d,S.selWeek-1,gi);
+        const delta=cur-before;const dl=delta>0?`+${delta}pp`:'—';
+        const hist=[];for(let k=1;k<=Math.min(S.selWeek,Q.current);k++)hist.push(latestPct(d,k,gi));
+        return `<div class="panel goal-card">
+          <div class="gc-top"><h3>${esc(g)}</h3><span class="gc-tag">目标 ${gi+1}</span></div>
+          <div class="gc-num"><b>${cur}</b><span style="font-size:14px;color:var(--muted);font-weight:600">%</span>
+            <span class="delta ${delta>0?'up':'flat'}">${dl}</span>
+            <span style="font-size:11px;color:var(--muted)">较上周</span></div>
+          <div class="gc-bar"><div class="fill" style="width:${cur}%"></div>
+            <i class="tick" style="left:25%"></i><i class="tick" style="left:50%"></i><i class="tick" style="left:75%"></i></div>
+          <div class="gc-note"><b>最新进展：</b>${esc(latestNote(d,gi))}</div>
+          <div class="gc-spark">${sparkSVG(hist.length?hist:[0,0])}<small>近 ${hist.length||2} 周走势</small></div>
+        </div>`}).join('')}
+    </div>
+    <div class="week-rail">
+      <span class="wr-label">周次</span>
+      ${Q.weeks.map(w=>`<button class="wk ${S.selWeek===w.n?'on':''} ${hasData(d,w.n)?'has':''} ${w.n===Q.current?'cur':''}"
+        ${w.n>Q.current?'disabled title="未开始"':`onclick="App.pickWeek(${w.n})"`}><b>W${w.n}</b>${w.range.slice(0,5)}</button>`).join('')}
+    </div>
+    <div class="panel week-panel">
+      <div class="wp-head"><h3>${fmtW(S.selWeek)} 进展 <small>${wk.range} · ${wk.n===Q.current?'本周':wk.n<Q.current?'已归档':'未开始'}</small></h3>
+        ${editableWeek&&!S.editWeek?`<button class="btn red sm" onclick="App.startWeekEdit()">${ic('edit')} 更新本周进度</button>`:''}
+        ${!editable&&wd?'':!wd&&S.selWeek<=Q.current?`<span class="pill submitted"><span class="dot"></span>待更新</span>`:''}
+      </div>
+      ${S.editWeek?renderWeekEditor(d):renderWeekDetail(d)}
+    </div>`;
+  }
+  $('#view-board').innerHTML=`
+  <div style="margin-bottom:16px"><div class="sec-label">部门目标进度看板 <small>DEPT PROGRESS BOARD</small></div>${permBanner}</div>
+  <div class="dept-tabs">
+    ${canSee.map(x=>`<button class="dtab ${x.id===d.id?'on':''}" onclick="App.pickDept('${x.id}')">${x.hasBoard?'<span class="dot"></span>':''}${esc(x.name)}${PERM.canEditBoard(x)?' · 可编辑':''}</button>`).join('')}
+  </div>
+  ${inner}`;
+}
+function latestNote(d,gi){
+  for(let k=S.selWeek;k>=1;k--){const w=d.weeks[k];if(w)return w.note}
+  return '暂无进展记录';
+}
+function renderWeekDetail(d){
+  const wd=d.weeks[S.selWeek];
+  if(!wd)return `<div style="padding:20px 0;text-align:center;color:var(--muted);font-size:13px">
+    ${ic('cal','width:22px;height:22px;opacity:.5')}<div style="margin-top:6px">本周暂未更新进度${PERM.canEditBoard(d)?'，点击右上角「更新本周进度」填写':''}</div></div>`;
+  return `
+  <div class="wp-grid">
+    ${(d.goals||[]).map((g,gi)=>`<div class="wp-goal">
+      <div class="wpg-top"><b>${esc(g)}</b><span>${wd.pct[gi]??0}%</span></div>
+      <div class="gc-bar"><div class="fill" style="width:${wd.pct[gi]??0}%"></div></div>
+      <p>目标 ${gi+1} · 本周完成度</p>
+    </div>`).join('')}
+  </div>
+  <div class="wp-note"><b style="color:var(--ink)">本周进展说明：</b>${esc(wd.note)}</div>
+  <div class="wp-meta">更新人：${esc(wd.by)} · 更新时间：${esc(wd.at)} · 状态：已提交</div>`;
+}
+function renderWeekEditor(d){
+  return `<div class="editor">
+    <h4>${ic('edit')} 更新 ${fmtW(S.selWeek)} 进度（负责人填写）</h4>
+    ${(d.goals||[]).map((g,gi)=>{const v=latestPct(d,S.selWeek,gi);return `
+    <div class="slider-row">
+      <div><div class="sr-name">${esc(g)}</div><input type="range" min="0" max="100" value="${v}" id="rng-${gi}" oninput="$('#nrg-${gi}').value=this.value"></div>
+      <div class="sr-val"><input id="nrg-${gi}" value="${v}" oninput="$('#rng-${gi}').value=this.value"><span>%</span></div>
+    </div>`}).join('')}
+    <div class="field" style="margin:14px 0 0"><label>本周进展说明</label>
+      <textarea class="ipt" id="wk-note" rows="3" placeholder="例：A 项目设计评审通过；首笔回款 ¥125 万到账……">${esc((d.weeks[S.selWeek]||{}).note||'')}</textarea></div>
+    <div class="editor-actions">
+      <button class="btn ghost sm" onclick="App.cancelWeekEdit()">取消</button>
+      <button class="btn red sm" onclick="App.saveWeek()">${ic('shield')} 保存并提交</button>
+    </div>
+  </div>`;
+}
+
+/* ============ 视图：团队审核（负责人） ============ */
+function renderReview(){
+  const rows=DB.team.map(id=>({id,c:DB.cards[id]}));
+  const nSub=rows.filter(r=>r.c.status==='submitted').length;
+  const nOk=rows.filter(r=>r.c.status==='confirmed').length;
+  const nBlank=rows.filter(r=>r.c.status==='blank'||r.c.status==='draft').length;
+  $('#view-review').innerHTML=`
+  <div class="sec-label" style="margin-bottom:14px">团队目标卡审核 <small>TEAM REVIEW · 一对一确认后锁定</small></div>
+  <div class="sum-chips">
+    <div class="sum-chip"><i style="background:var(--amber)"></i><b>${nSub}</b><span>待一对一确认</span></div>
+    <div class="sum-chip"><i style="background:var(--red-deep)"></i><b>${nOk}</b><span>已确认锁定</span></div>
+    <div class="sum-chip"><i style="background:var(--line-2)"></i><b>${nBlank}</b><span>未提交 / 草稿</span></div>
+    <div class="sum-chip"><i style="background:var(--ink)"></i><b>${rows.length}</b><span>成员总数</span></div>
+  </div>
+  <div class="rev-list">
+  ${rows.map(({id,c})=>{
+    const st=c.status==='submitted'?'<span class="pill submitted"><span class="dot"></span>待确认</span>':
+      c.status==='confirmed'?'<span class="pill confirmed"><span class="dot"></span>已锁定</span>':
+      c.status==='draft'?'<span class="pill draft">草稿中</span>':'<span class="pill draft">未开始</span>';
+    const peek=goalsOf(c)[0]||'（尚未填写目标）';
+    return `<div class="panel rev-row">
+      <div class="rv2">${esc((c.name||'?')[0])}</div>
+      <div class="rmain">
+        <b>${esc(c.name)}</b>&nbsp;&nbsp;${st}
+        <div class="rmeta"><span class="mono">${esc(c.code)}</span><span>${esc(seqOf(c.seq).name)}</span>${c.submittedAt?`<span>提交于 ${esc(c.submittedAt)}</span>`:''}${c.confirmedAt?`<span>确认于 ${esc(c.confirmedAt)}</span>`:''}</div>
+        <div class="goal-peek">${esc(peek)}</div>
+      </div>
+      <div class="rev-actions">
+        <button class="btn ghost xs" onclick="App.openMember('${id}')">${ic('eye')} 查看目标卡</button>
+        ${c.status==='submitted'?`
+        <button class="btn red xs" onclick="App.confirmAsk('${id}')">${ic('shield')} 确认锁定</button>
+        <button class="btn danger xs" onclick="App.rejectAsk('${id}')">退回</button>`:''}
+      </div>
+    </div>`}).join('')}
+  </div>`;
+}
+
+/* ============ 视图：BP 总览 ============ */
+function renderBP(){
+  const impl=deptOf('impl');
+  const t=DB.depts.reduce((a,d)=>a+d.stats.t,0),c=DB.depts.reduce((a,d)=>a+d.stats.c,0);
+  const boards=DB.depts.filter(d=>d.hasBoard);
+  const timely=boards.filter(d=>d.lastAt&&d.lastAt!=='—').length;
+  $('#view-bp').innerHTML=`
+  <div class="sec-label" style="margin-bottom:14px">BP 总览 · 全公司冲刺进度 <small>OVERVIEW</small></div>
+  <div class="stat-grid">
+    <div class="panel stat"><div class="st-label">${ic('users')}参与人数</div><div class="st-num">${t}<small> 人</small></div><div class="st-sub">覆盖 10 个序列部门</div></div>
+    <div class="panel stat"><div class="st-label">${ic('shield')}目标卡确认率</div><div class="st-num">${Math.round(c/t*100)}<small> %</small></div>
+      <div class="mini-bar"><i style="width:${c/t*100}%"></i></div><div class="st-sub">已确认 ${c} / ${t} 人</div></div>
+    <div class="panel stat"><div class="st-label">${ic('board')}看板开设</div><div class="st-num">${boards.length}<small> / ${DB.depts.length}</small></div><div class="st-sub">部门进度看板</div></div>
+    <div class="panel stat"><div class="st-label">${ic('cal')}本周更新及时</div><div class="st-num">${timely}<small> / ${boards.length}</small></div>
+      <div class="mini-bar"><i style="width:${boards.length?timely/boards.length*100:0}%"></i></div><div class="st-sub">截至 ${esc(impl.lastAt)}</div></div>
+  </div>
+  <div class="panel" style="overflow:hidden">
+    <table class="bp">
+      <thead><tr><th>部门</th><th>负责人</th><th style="width:220px">目标卡确认进度</th><th>看板最近更新</th><th style="width:170px">操作</th></tr></thead>
+      <tbody>
+      ${DB.depts.map(d=>`<tr>
+        <td><b>${esc(d.name)}</b></td>
+        <td>${esc(d.head)} <span class="mono">${d.hasBoard?'':'· 待开设看板'}</span></td>
+        <td><div class="pb-cell"><div class="mini-bar"><i style="width:${d.stats.c/d.stats.t*100}%"></i></div><span>${d.stats.c}/${d.stats.t}</span></div></td>
+        <td>${d.hasBoard?`<span class="pill ${d.lastAt==='10.16'?'ok':'submitted'}" style="font-size:11px">${esc(d.lastAt)}</span>`:'<span style="color:var(--muted);font-size:12px">—</span>'}</td>
+        <td><div style="display:flex;gap:7px">
+          <button class="btn ghost xs" onclick="App.viewDeptBoard('${d.id}')">${ic('eye')} 看板</button>
+          <button class="btn ghost xs" onclick="App.remind('${esc(d.head)}')">${ic('bell')} 提醒</button>
+        </div></td>
+      </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+/* ============ 侧栏 / 顶栏 ============ */
+function renderNav(){
+  const p=person();
+  const items=[
+    {r:'card',icon:'card',t:'我的冲刺卡',show:true},
+    {r:'board',icon:'board',t:'部门进度看板',show:true},
+    {r:'review',icon:'shield',t:'团队审核',show:p.role==='head',bdg:DB.team.filter(id=>DB.cards[id].status==='submitted').length},
+    {r:'bp',icon:'chart',t:'BP 总览',show:p.role==='bp'},
+  ].filter(i=>i.show);
+  const groups=[{g:'目标卡',from:0,to:1},{g:'看板 · 管理',from:1,to:items.length}];
+  $('#nav').innerHTML=groups.map(gr=>`<div class="nav-group"><i>${gr.g}</i>
+    ${items.slice(gr.from,gr.to).map(i=>`<button class="nav-item ${S.route===i.r?'active':''}" onclick="App.go('${i.r}')">${ic(i.icon)}<span>${i.t}</span>${i.bdg?`<span class="bdg">${i.bdg}</span>`:''}</button>`).join('')}
+  </div>`).join('');
+}
+function renderPersonas(){
+  $('#persona-list').innerHTML=Object.values(DB.people).map(p=>`
+    <button class="persona ${S.persona===p.id?'on':''}" onclick="App.switchPersona('${p.id}')">
+      <span class="pv">${esc(p.name[0])}</span><div><div style="font-size:12.5px;font-weight:600;color:inherit">${esc(p.name)}</div><small>${esc(p.roleName)} · ${esc(p.dept)}</small></div>
+    </button>`).join('');
+}
+const ROUTE_TITLES={card:['我的冲刺目标卡','填写 → 一对一确认 → 负责人锁定'],board:['部门目标进度看板','部门负责人每周更新，部门成员可见'],review:['团队目标卡审核','与成员一对一确认后锁定，锁定不可修改'],bp:['BP 总览','全公司冲刺确认率与看板更新情况']};
+function renderTopbar(){
+  const p=person();const[title,sub]=ROUTE_TITLES[S.route]||['',''];
+  $('#topbar').innerHTML=`
+    <div><h1>${title}</h1><div class="crumb">${sub}</div></div>
+    <div class="topbar-right">
+      <span class="chip red"><span class="dot"></span>${Q.label}</span>
+      <span class="chip">${ic('cal','width:13px;height:13px')}本周 · ${fmtW(Q.current)}</span>
+      <div class="me"><span class="mv">${esc(p.name[0])}</span><div><b>${esc(p.name)}</b><small>${esc(p.roleName)}</small></div></div>
+    </div>`;
+}
+
+/* ============ 主渲染 ============ */
+function render(){
+  const p=person();
+  if(S.route==='review'&&!PERM.canReview())S.route='card';
+  if(S.route==='bp'&&!PERM.canBP())S.route='card';
+  ['card','board','review','bp'].forEach(r=>{
+    const el=$('#view-'+r);el.classList.toggle('on',S.route===r);
+  });
+  renderNav();renderPersonas();renderTopbar();
+  if(S.route==='card')renderCardView();
+  if(S.route==='board')renderBoard();
+  if(S.route==='review')renderReview();
+  if(S.route==='bp')renderBP();
+  const hash={card:'#/card',board:'#/board',review:'#/review',bp:'#/bp'}[S.route];
+  if(location.hash!==hash)history.replaceState(null,'',hash);
+}
+
+/* ============ Modal ============ */
+function openModal(html){$('#modal-root').innerHTML=html;$('#modal-root').classList.add('on')}
+function closeModal(){$('#modal-root').classList.remove('on');$('#modal-root').innerHTML=''}
+
+/* ============ 应用动作 ============ */
+const App={
+  go(r){S.route=r;if(r==='board')S.editWeek=false;render()},
+  switchPersona(id){S.persona=id;S.route='card';S.editWeek=false;const p=DB.people[id];S.selDept=p.deptId;S.selWeek=Q.current;render();toast(`已切换为 ${p.name}（${p.roleName}），权限已同步`)},
+  pickSeq(id){const c=myCard();if(c.status!=='draft')return;c.seq=id;renderCardView()},
+  onFormInput(){
+    const c=myCard();if(c.status!=='draft')return;
+    c.name=$('#f-name').value.trim();c.code=$('#f-code').value.trim();c.dept=$('#f-dept').value.trim();
+    c.goals=$('#f-goals').value;
+    c.path=[...document.querySelectorAll('.path-input')].map(i=>i.value);
+    $('#card-preview').innerHTML=cardHTML(S.persona,'me');
+  },
+  addPath(){const c=myCard();c.path.push('');renderCardView();const list=$('#path-list');const inputs=list.querySelectorAll('.path-input');inputs[inputs.length-1].focus()},
+  rmPath(i){const c=myCard();if(c.path.length<=1){c.path=['']}else{c.path.splice(i,1)}renderCardView()},
+  saveDraft(){App.onFormInput();const c=myCard();c.savedAt='刚刚';save();renderCardView();toast('草稿已保存')},
+  submitCard(){
+    App.onFormInput();const c=myCard();
+    if(!c.name||!c.code||!c.dept){toast('请填写姓名、员工编码与部门',1);return}
+    if(!goalsOf(c).length){toast('请至少填写一个冲刺目标',1);return}
+    if(!pathsOf(c).length){toast('请至少填写一条实施路径',1);return}
+    openModal(`<div class="modal" style="max-width:430px"><div class="modal-pad">
+      <h3 style="font-size:16px;margin-bottom:10px">提交部门负责人确认</h3>
+      <p style="font-size:13.5px;color:var(--ink-2);line-height:1.8">提交后目标卡进入<b>「一对一确认」</b>环节，请与部门负责人（${esc(deptOf('impl').head)}）当面确认目标与路径。<br>确认通过前仍可退回修改。</p>
+      <div class="modal-actions" style="padding:16px 0 0;border:none">
+        <button class="btn ghost sm" onclick="App.closeModal()">再想想</button>
+        <button class="btn red sm" onclick="App.doSubmit()">${ic('send')} 确认提交</button>
+      </div></div></div>`);
+  },
+  doSubmit(){const c=myCard();c.status='submitted';c.submittedAt='刚刚';c.savedAt='刚刚';save();closeModal();renderCardView();renderNav();toast('已提交，等待部门负责人一对一确认')},
+  exportPNG(uid){
+    const el=document.getElementById('scard-'+uid);
+    if(!el){toast('暂无可导出的目标卡',1);return}
+    if(typeof html2canvas==='undefined'){toast('导出组件未加载（离线），已为你打开打印',1);App.printCard(uid);return}
+    html2canvas(el,{scale:2,useCORS:true,backgroundColor:null}).then(cv=>{
+      const a=document.createElement('a');const name=(myCard().name||'成员');
+      a.download=`冲刺目标卡-${name}-2026Q4.png`;a.href=cv.toDataURL('image/png');a.click();toast('目标卡图片已导出');
+    }).catch(()=>{toast('导出失败，已为你打开打印',1);App.printCard(uid)});
+  },
+  printCard(uid){
+    const el=document.getElementById('scard-'+uid);if(!el){toast('暂无可打印的目标卡',1);return}
+    const m=$('#printMount');m.innerHTML='';m.appendChild(el.cloneNode(true));
+    document.body.classList.add('printing');
+    const done=()=>{document.body.classList.remove('printing');m.innerHTML='';window.removeEventListener('afterprint',done)};
+    window.addEventListener('afterprint',done);
+    setTimeout(()=>window.print(),60);
+  },
+  /* ---- 看板 ---- */
+  pickDept(id){if(!PERM.canSwitchDept(deptOf(id))){toast('员工仅可查看本部门看板',1);return}S.selDept=id;S.editWeek=false;render()},
+  pickWeek(n){S.selWeek=n;S.editWeek=false;render()},
+  startWeekEdit(){S.editWeek=true;render()},
+  cancelWeekEdit(){S.editWeek=false;render()},
+  saveWeek(){
+    const d=deptOf(S.selDept);const pcts=d.goals.map((_,gi)=>Math.max(0,Math.min(100,+($('#nrg-'+gi)?.value||latestPct(d,S.selWeek,gi)))));
+    const note=$('#wk-note').value.trim();
+    if(!note){toast('请填写本周进展说明',1);return}
+    d.weeks[S.selWeek]={pct:pcts,note,at:'刚刚',by:person().name};
+    d.lastAt='刚刚';S.editWeek=false;save();render();toast(`${fmtW(S.selWeek)} 进度已更新，全员可见`);
+  },
+  editDept(){
+    const d=deptOf(S.selDept);
+    openModal(`<div class="modal" style="max-width:520px"><div class="modal-head"><h3>部门目标设置 · ${esc(d.name)}</h3><button class="x" onclick="App.closeModal()">${ic('x')}</button></div>
+    <div class="modal-pad">
+      <div class="row2">
+        <div class="field"><label>部门</label><input class="ipt" id="ed-name" value="${esc(d.name)}"></div>
+        <div class="field"><label>负责人</label><input class="ipt" id="ed-head" value="${esc(d.head)}"></div>
+      </div>
+      <div class="field"><label>目标 1 <em>*</em></label><input class="ipt" id="ed-g1" value="${esc(d.goals[0]||'')}" placeholder="例：3 个重点项目按期交付，按期率 100%"></div>
+      <div class="field"><label>目标 2 <em>*</em></label><input class="ipt" id="ed-g2" value="${esc(d.goals[1]||'')}" placeholder="例：季度验收回款 ¥500 万"></div>
+      <div class="field"><label>实施路径（每行一条）</label><textarea class="ipt" id="ed-path" rows="3">${esc((d.path||[]).join('\n'))}</textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost sm" onclick="App.closeModal()">取消</button>
+      <button class="btn red sm" onclick="App.saveDept()">${ic('shield')} 保存并生成看板</button>
+    </div></div>`);
+  },
+  saveDept(){
+    const d=deptOf(S.selDept);
+    const g1=$('#ed-g1').value.trim(),g2=$('#ed-g2').value.trim();
+    if(!g1||!g2){toast('目标 1 与目标 2 均为必填',1);return}
+    d.name=$('#ed-name').value.trim()||d.name;d.head=$('#ed-head').value.trim()||d.head;
+    d.goals=[g1,g2];d.path=$('#ed-path').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    d.hasBoard=true;save();closeModal();render();toast('部门目标已保存，看板已生成');
+  },
+  /* ---- 审核 ---- */
+  openMember(id){
+    const c=DB.cards[id];const canConfirm=c.status==='submitted'&&PERM.canReview();
+    openModal(`<div class="modal" style="width:560px"><div class="modal-head"><h3>目标卡 · ${esc(c.name)}</h3>
+      <button class="x" onclick="App.closeModal()">${ic('x')}</button></div>
+      <div class="modal-card-zone">${cardHTML(id,'mv'+id)}</div>
+      <div class="modal-actions">
+        <button class="btn ghost sm" onclick="App.exportPNG('mv${id}')">${ic('down')} 导出图片</button>
+        ${canConfirm?`
+        <button class="btn danger sm" onclick="App.rejectAsk('${id}')">退回修改</button>
+        <button class="btn red sm" onclick="App.confirmAsk('${id}')">${ic('shield')} 确认并锁定</button>`:''}
+      </div></div>`);
+  },
+  confirmAsk(id){
+    const c=DB.cards[id];
+    openModal(`<div class="modal" style="max-width:430px"><div class="modal-pad">
+      <h3 style="font-size:16px;margin-bottom:10px">确认锁定 ${esc(c.name)} 的目标卡？</h3>
+      <p style="font-size:13.5px;color:var(--ink-2);line-height:1.8">请确认已与本人<b>一对一沟通</b>并对目标达成一致。锁定后该目标卡<b style="color:var(--red-deep)">双方均不可修改</b>，作为本季度冲刺与复盘依据。</p>
+      <div class="modal-actions" style="padding:16px 0 0;border:none">
+        <button class="btn ghost sm" onclick="App.closeModal()">取消</button>
+        <button class="btn red sm" onclick="App.doConfirm('${id}')">${ic('lock')} 确认锁定</button>
+      </div></div></div>`);
+  },
+  doConfirm(id){const c=DB.cards[id];c.status='confirmed';c.confirmedAt='刚刚';c.confirmedBy=person().name;save();closeModal();render();toast(`${c.name} 的目标卡已确认锁定，盖章生效`)},
+  rejectAsk(id){
+    const c=DB.cards[id];
+    openModal(`<div class="modal" style="max-width:430px"><div class="modal-pad">
+      <h3 style="font-size:16px;margin-bottom:10px">退回 ${esc(c.name)} 的目标卡</h3>
+      <div class="field"><label>退回意见（可选）</label><textarea class="ipt" id="rj-note" rows="2" placeholder="例：目标请再量化，路径补充回款动作"></textarea></div>
+      <div class="modal-actions" style="padding:10px 0 0;border:none">
+        <button class="btn ghost sm" onclick="App.closeModal()">取消</button>
+        <button class="btn sm" onclick="App.doReject('${id}')">确认退回</button>
+      </div></div></div>`);
+  },
+  doReject(id){const c=DB.cards[id];c.status='draft';c.submittedAt='';save();closeModal();render();toast(`已退回 ${c.name} 修改，退回意见已通知本人`)},
+  /* ---- BP ---- */
+  viewDeptBoard(id){S.selDept=id;S.selWeek=Q.current;App.go('board')},
+  remind(head){toast(`已向 ${head} 发送填写 / 更新提醒（演示）`)},
+  /* ---- 其它 ---- */
+  openPerm(){
+    openModal(`<div class="modal" style="max-width:600px"><div class="modal-head"><h3>权限说明</h3><button class="x" onclick="App.closeModal()">${ic('x')}</button></div>
+    <div class="modal-pad">
+      <table class="matrix">
+        <tr><th style="text-align:left">功能</th><th>员工</th><th>部门负责人</th><th>BP / 人力</th></tr>
+        <tr><td>填写个人冲刺卡</td><td class="y">✓ 本人（确认前）</td><td class="y">✓ 本人（确认前）</td><td class="y">✓ 本人（确认前）</td></tr>
+        <tr><td>审核 · 锁定成员目标卡</td><td class="n">—</td><td class="y">✓ 本部门</td><td class="n">—</td></tr>
+        <tr><td>查看部门进度看板</td><td class="p">仅本部门 · 只读</td><td class="y">✓ 本部门 · 可编辑</td><td class="y">✓ 全部 · 只读</td></tr>
+        <tr><td>填写部门目标（部门/负责人/目标1/目标2/路径）</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td></tr>
+        <tr><td>每周更新部门进度</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td></tr>
+        <tr><td>全公司统计与提醒</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td></tr>
+        <tr><td>目标卡导出（PNG / 打印）</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+      </table>
+      <p class="hint" style="margin-top:12px">锁定规则：部门负责人审核确认后，员工与负责人双方均不可修改；退回后员工可重新填写再提交。</p>
+    </div></div>`);
+  },
+  openGuide(){
+    openModal(`<div class="modal" style="max-width:520px"><div class="modal-head"><h3>原型演示指引</h3><button class="x" onclick="App.closeModal()">${ic('x')}</button></div>
+    <div class="modal-pad"><ol class="guide">
+      <li><b>左下角切换演示身份</b>：员工 张明 / 部门负责人 李强 / BP 王芳，左侧菜单与操作权限随之变化。</li>
+      <li><b>员工</b>：在「我的冲刺卡」选择序列、填写目标与路径 → 点击「提交负责人确认」。</li>
+      <li><b>负责人</b>：切到「团队审核」查看成员目标卡 → 与成员一对一确认后「确认锁定」，锁定后双方不可修改（卡片盖章）。</li>
+      <li><b>负责人</b>：在「部门进度看板」设置部门目标（部门 / 负责人 / 目标1 / 目标2 / 路径），并<b>每周更新进度</b>。</li>
+      <li><b>员工</b>：看板为只读，且只能看到本部门进度。</li>
+      <li><b>BP</b>：「BP 总览」查看全公司确认率、看板更新情况并发送提醒。</li>
+      <li><b>导出</b>：冲刺卡支持导出 PNG 图片与打印 / PDF。</li>
+    </ol></div></div>`);
+  },
+  reset(){localStorage.removeItem(LSKEY);location.href=location.pathname+'#/card';location.reload()},
+  closeModal,
+};
+
+/* ============ 启动 ============ */
+$('#logo-mark').innerHTML=ic('flag');
+load();
+(function(){
+  const h=location.hash.replace('#/','');
+  if(['card','board','review','bp'].includes(h))S.route=h;
+  const q=new URLSearchParams(location.search).get('p');
+  if(q&&DB.people[q])S.persona=q;
+  const p=person();S.selDept=p.deptId;
+  render();
+  setTimeout(()=>toast('原型已就绪：左下角可切换 员工 / 负责人 / BP 三种身份体验权限'),600);
+})();
+</script>
+</body>
+</html>
