@@ -581,12 +581,6 @@ function cardHTML(pid,uid){
         </tr>`).join('')}
       </table>
       <div class="sc-words">${esc(WORDS)}</div>
-      <table class="sc-tb" style="margin-top:12px">
-        <tr>
-          <td class="lab" style="width:88px">部门主管签发</td><td class="val ${c.status==='issued'?'red':'pending'}">${c.status==='issued'?esc(c.issuedBy||'部门主管'):'待下发'}</td>
-          <td class="lab" style="width:66px">下发日期</td><td class="val ${c.status==='issued'?'':'pending'}">${c.status==='issued'?esc(c.issuedAt):'—'}</td>
-        </tr>
-      </table>
       <div class="sc-foot"><span>${esc(c.code||'')} · Q4-2026 · 达标冲刺 · 无需员工回签</span><div class="sc-bar"></div></div>
     </div>
     ${c.status==='issued'?sealSVG(c.issuedAt):''}
