@@ -152,48 +152,34 @@ textarea.ipt{resize:vertical;line-height:1.7}
 .preview-tip{font-size:11.5px;color:var(--muted);letter-spacing:.5px}
 .export-row{display:flex;gap:10px}
 
-/* ============ 达标冲刺目标卡（实体卡片，按官方 Word 模板） ============ */
-.scard{width:460px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;position:relative;box-shadow:var(--shadow-card);font-size:14px}
-.sc-banner{display:block;width:100%;height:auto}
-.sc-titlebar{background:linear-gradient(120deg,#F0101C,#B0000E);color:#fff;padding:13px 20px 12px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden}
-.sc-titlebar::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 10px,transparent 10px 20px);pointer-events:none}
-.sc-t1{font-size:19px;font-weight:900;letter-spacing:2.5px;text-shadow:0 2px 8px rgba(0,0,0,.15);position:relative;z-index:1}
-.sc-t2{font-size:10.5px;letter-spacing:2px;opacity:.88;margin-top:3px;position:relative;z-index:1}
-.sc-q4{font-size:34px;font-weight:900;font-style:italic;line-height:.9;color:transparent;-webkit-text-stroke:1.4px rgba(255,255,255,.85);letter-spacing:-1px;position:relative;z-index:1}
-.sc-body{padding:16px 20px 15px}
-.sc-info{display:grid;grid-template-columns:1.1fr 1.35fr 1.15fr;background:var(--info-bg);border:1px solid var(--line-2);border-radius:9px;overflow:hidden}
-.sc-info .cell{padding:8px 13px;border-right:1px solid var(--line-2)}
-.sc-info .cell:last-child{border-right:none}
-.sc-info .cell span{display:block;font-size:9.5px;color:var(--muted);letter-spacing:2.5px;margin-bottom:1px}
-.sc-info .cell b{font-size:13.5px;letter-spacing:.5px}
-.sc-sec-label{display:flex;align-items:baseline;gap:8px;margin:15px 0 8px}
-.sc-sec-label::before{content:'';width:7px;height:7px;border-radius:2px;background:var(--red);align-self:center}
-.sc-sec-label b{font-size:13.5px;font-weight:800;letter-spacing:1px}
-.sc-sec-label span{font-size:9.5px;letter-spacing:3px;color:var(--muted)}
-.sc-sec-label i{font-style:normal;font-size:10px;color:var(--muted);margin-left:auto;font-weight:400}
-.sc-gtable{border:1.5px solid var(--red-line);border-radius:9px;overflow:hidden}
-.sc-ghead{display:flex;gap:10px;align-items:center;background:var(--red-soft);color:var(--red-deep);padding:6.5px 14px;font-size:11px;font-weight:800;letter-spacing:1.5px}
-.sc-ghead .h-no{width:26px}
-.sc-ghead .h-t{flex:1}
-.sc-ghead .h-v{width:74px;text-align:right}
-.sc-grow{display:flex;gap:10px;align-items:center;padding:8px 14px;border-top:1px solid #F7E0E1}
-.sc-grow:first-of-type{border-top:none}
-.sc-grow .gno{width:26px;flex:none;font-size:16px;font-weight:900;font-style:italic;color:var(--red);line-height:1.2}
-.sc-grow .gt{flex:1;font-size:12.5px;font-weight:600;line-height:1.5}
-.sc-grow .gv{width:74px;flex:none;text-align:right;font-size:16.5px;font-weight:800;color:var(--red-deep);white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1.2}
-.sc-grow .gv i{font-style:normal;font-size:10px;font-weight:600;opacity:.75;margin-left:1px}
-.sc-grow .gv.empty{color:#C9BFB4;font-size:11px;font-weight:500;letter-spacing:1px}
-.sc-words{margin-top:13px;background:var(--red-paper);border-left:3px solid var(--red);border-radius:0 9px 9px 0;padding:9px 14px;font-size:11px;color:#8C5B60;line-height:1.9}
-.sc-sign{display:flex;margin-top:13px;border-top:1px dashed var(--line-2);padding-top:11px;gap:14px}
-.sc-sign-cell{flex:1}
-.sc-sign-cell span{display:block;font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px}
-.sc-sign-cell b{display:block;font-size:14px;font-weight:700;letter-spacing:2px}
-.sc-sign-cell b.pending{color:var(--amber);font-size:12px;font-weight:600;letter-spacing:.5px}
-.sc-sign-cell i{font-style:normal;font-size:10.5px;color:var(--muted);font-family:var(--mono)}
-.sc-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+/* ============ 达标冲刺目标卡（实体卡片，还原官方 Word 版式） ============ */
+.scard{width:460px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;box-shadow:var(--shadow-card);font-size:14px}
+.sc-banner{display:block;width:calc(100% - 44px);height:auto;margin:14px auto 0}
+.sc-dochead{padding:10px 22px 2px;text-align:center}
+.sc-title{font-size:23px;font-weight:900;letter-spacing:5px;color:var(--ink);line-height:1.3}
+.sc-slogan{font-size:11.5px;color:var(--red);letter-spacing:3.5px;font-weight:700;margin-top:4px}
+.sc-body{padding:14px 22px 16px}
+/* 文档式表格（信息行 / 目标表 / 签发行） */
+.sc-tb{width:100%;border-collapse:collapse;table-layout:fixed}
+.sc-tb td,.sc-tb th{border:1px solid #D9A9AD;padding:7px 8px;font-size:12.5px;line-height:1.5;vertical-align:middle;word-break:break-all}
+.sc-tb .lab{background:var(--info-bg);color:var(--ink-2);font-weight:600;text-align:center;letter-spacing:1px}
+.sc-tb .val{font-weight:700;text-align:center;color:var(--ink)}
+.sc-tb .val.red{color:var(--red-deep)}
+.sc-tb .val.pending{color:var(--amber);font-weight:600}
+.sc-sec{margin:13px 0 7px;font-weight:800;color:var(--red);font-size:13.5px;letter-spacing:1.5px;display:flex;align-items:center;gap:7px}
+.sc-sec::before{content:'';width:7px;height:7px;border-radius:2px;background:var(--red);flex:none}
+.sc-sec small{font-weight:400;color:var(--muted);font-size:10px;letter-spacing:1px;margin-left:auto}
+.sc-ghead th{background:var(--red-soft);color:var(--red-deep);font-size:11.5px;font-weight:800;letter-spacing:2px;text-align:center;padding:6.5px 8px}
+.sc-gno{width:46px;text-align:center;font-weight:800;color:var(--red);font-size:13px}
+.sc-gt{font-size:12.5px;font-weight:600;line-height:1.65;padding:8px 11px}
+.sc-gt .gv{color:var(--red-deep);font-weight:800;font-variant-numeric:tabular-nums}
+.sc-gt .gv i{font-style:normal;font-size:10.5px;font-weight:600;opacity:.8;margin-left:1px}
+.sc-gt .gv.empty{color:#C9BFB4;font-weight:500;letter-spacing:1px;font-size:11px}
+.sc-words{margin-top:12px;background:var(--red-paper);border:1px solid var(--red-line);border-radius:3px;padding:9px 13px;font-size:10.8px;color:#96574B;line-height:1.85;text-align:justify}
+.sc-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:9px;border-top:1px solid var(--line)}
 .sc-foot span{font-size:9.5px;letter-spacing:1.5px;color:var(--muted);font-family:var(--mono)}
-.sc-bar{width:118px;height:22px;background:repeating-linear-gradient(90deg,var(--ink) 0 1.5px,transparent 1.5px 4px,var(--ink) 4px 5.5px,transparent 5.5px 9px,var(--ink) 9px 12px,transparent 12px 14px);opacity:.75}
-.sc-seal{position:absolute;right:24px;top:58%;width:112px;height:112px;color:#B80010;opacity:.94;transform:rotate(-13deg);pointer-events:none;mix-blend-mode:multiply}
+.sc-bar{width:118px;height:20px;background:repeating-linear-gradient(90deg,var(--ink) 0 1.5px,transparent 1.5px 4px,var(--ink) 4px 5.5px,transparent 5.5px 9px,var(--ink) 9px 12px,transparent 12px 14px);opacity:.7}
+.sc-seal{position:absolute;right:30px;bottom:88px;width:108px;height:108px;color:#B80010;opacity:.94;transform:rotate(-13deg);pointer-events:none;mix-blend-mode:multiply}
 .scard.is-locked .sc-seal{animation:stamp .45s cubic-bezier(.2,1.6,.4,1)}
 @keyframes stamp{0%{transform:rotate(-13deg) scale(1.9);opacity:0}60%{opacity:.94}100%{transform:rotate(-13deg) scale(1)}}
 .scard.empty-state{border-style:dashed;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);min-height:560px;background:transparent}
@@ -555,37 +541,38 @@ function cardHTML(pid,uid){
   const items=cardItems(c);
   if(c.status==='blank'||!items.some(i=>i.v))
     return `<div class="scard empty-state">${ic('edit')}<b style="font-size:14px">目标卡待填写</b><span style="font-size:12px">由部门主管选择序列、填写目标值后下发</span></div>`;
+  const val=it=>it.v?`<span class="gv">${esc(it.v)}<i>${esc(it.u)}</i></span>`:`<span class="gv empty">待定</span>`;
   return `
   <div class="scard ${c.status==='issued'?'is-locked':''}" id="scard-${uid}">
     <img class="sc-banner" src="${BANNER}" alt="火力全开 决胜2026">
-    <div class="sc-titlebar">
-      <div>
-        <div class="sc-t1">四季度达标冲刺目标卡</div>
-        <div class="sc-t2">聚力收官夺胜绩 · 颗粒归仓续新章</div>
-      </div>
-      <div class="sc-q4">Q4</div>
+    <div class="sc-dochead">
+      <div class="sc-title">四季度达标冲刺目标卡</div>
+      <div class="sc-slogan">聚力收官夺胜绩&ensp;颗粒归仓续新章</div>
     </div>
     <div class="sc-body">
-      <div class="sc-info">
-        <div class="cell"><span>姓 名</span><b>${esc(c.name||'')}</b></div>
-        <div class="cell"><span>部 门</span><b>${esc(c.dept||'')}</b></div>
-        <div class="cell"><span>序 列</span><b>${esc(seq.name.replace('（PMO）',''))}</b></div>
-      </div>
-      <div class="sc-sec-label"><b>本季度核心目标</b><span>GOALS</span><i>由部门经营目标倒推分解到人</i></div>
-      <div class="sc-gtable">
-        <div class="sc-ghead"><span class="h-no">序号</span><span class="h-t">目标项与目标值</span><span class="h-v">目标值</span></div>
-        ${items.map((it,i)=>`<div class="sc-grow">
-          <div class="gno">${String(i+1).padStart(2,'0')}</div>
-          <div class="gt">${esc(it.t)}${it.u?` <small style="font-weight:400;color:var(--muted);font-size:10.5px">（${esc(it.u)}）</small>`:''}</div>
-          <div class="gv ${it.v?'':'empty'}">${it.v?`${esc(it.v)}<i>${esc(it.u)}</i>`:'待 定'}</div>
-        </div>`).join('')}
-      </div>
-      <div class="sc-words">「 ${esc(WORDS)} 」</div>
-      <div class="sc-sign">
-        <div class="sc-sign-cell"><span>部门主管签发 / LEAD</span><b class="${c.status==='issued'?'':'pending'}">${c.status==='issued'?esc(c.issuedBy||'部门主管'):'待下发'}</b><i>${c.issuedAt||'无需员工回签'}</i></div>
-        <div class="sc-sign-cell" style="text-align:right"><span>下发状态</span><b class="${c.status==='issued'?'':'pending'}">${c.status==='issued'?'已下发到人':'填写中'}</b><i>${c.status==='issued'?'锁定 · 不可修改':'—'}</i></div>
-      </div>
-      <div class="sc-foot"><span>${esc(c.code||'')} · Q4-2026 · 达标冲刺</span><div class="sc-bar"></div></div>
+      <table class="sc-tb">
+        <tr>
+          <td class="lab" style="width:46px">姓名</td><td class="val">${esc(c.name||'')}</td>
+          <td class="lab" style="width:46px">部门</td><td class="val">${esc(c.dept||'')}</td>
+          <td class="lab" style="width:46px">序列</td><td class="val">${esc(seq.name.replace('（PMO）','').replace('序列',''))}</td>
+        </tr>
+      </table>
+      <div class="sc-sec">本季度核心目标<small>由部门经营目标倒推分解到人</small></div>
+      <table class="sc-tb sc-gtb">
+        <tr class="sc-ghead-row"><th class="sc-gno">序号</th><th>目标项与目标值</th></tr>
+        ${items.map((it,i)=>`<tr>
+          <td class="sc-gno">${i+1}</td>
+          <td class="sc-gt">${esc(it.t)}（${esc(it.u)}）：${val(it)}</td>
+        </tr>`).join('')}
+      </table>
+      <div class="sc-words">${esc(WORDS)}</div>
+      <table class="sc-tb" style="margin-top:12px">
+        <tr>
+          <td class="lab" style="width:88px">部门主管签发</td><td class="val ${c.status==='issued'?'red':'pending'}">${c.status==='issued'?esc(c.issuedBy||'部门主管'):'待下发'}</td>
+          <td class="lab" style="width:66px">下发日期</td><td class="val ${c.status==='issued'?'':'pending'}">${c.status==='issued'?esc(c.issuedAt):'—'}</td>
+        </tr>
+      </table>
+      <div class="sc-foot"><span>${esc(c.code||'')} · Q4-2026 · 达标冲刺 · 无需员工回签</span><div class="sc-bar"></div></div>
     </div>
     ${c.status==='issued'?sealSVG(c.issuedAt):''}
   </div>`;
