@@ -6,11 +6,11 @@
 <title>冲刺目标跟踪系统 · 2026 Q4</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-/* ============ Design Tokens ============ */
+/* ============ Design Tokens（官方红 #E60012） ============ */
 :root{
-  --red:#D9342B; --red-deep:#B0241C; --red-ink:#8C1D16; --red-soft:#FBEFED; --red-line:#F0CFCB;
+  --red:#E60012; --red-deep:#A8000B; --red-soft:#FCEBEB; --red-line:#F2C9CC; --red-paper:#FDF2F3;
   --ink:#211C19; --ink-2:#5C544D; --muted:#8E847B;
-  --paper:#F6F3EF; --card:#FFFFFF; --line:#E7E0D8; --line-2:#D8CFC2;
+  --paper:#F6F3EF; --card:#FFFFFF; --line:#E7E0D8; --line-2:#D8CFC2; --info-bg:#F4F6FA;
   --amber:#B97F16; --amber-soft:#FBF3E2; --amber-line:#EAD9B4;
   --ok:#2E7D4F; --ok-soft:#E9F3EC;
   --side:#201B18; --side-txt:#B9AFA5;
@@ -32,7 +32,7 @@ input,textarea,select{font-family:inherit;font-size:14px;color:var(--ink)}
 #app{display:grid;grid-template-columns:228px 1fr;height:100vh;overflow:hidden}
 .side{background:var(--side);color:var(--side-txt);display:flex;flex-direction:column;overflow-y:auto}
 .side-logo{display:flex;align-items:center;gap:10px;padding:20px 18px 16px}
-.side-logo .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#E2483D,#B0241C);display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
+.side-logo .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#F01A26,#A8000B);display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
 .side-logo .mark .ic{width:19px;height:19px}
 .side-logo b{color:#fff;font-size:14.5px;display:block;line-height:1.3;letter-spacing:.5px}
 .side-logo i{font-style:normal;font-size:10px;letter-spacing:1.5px;color:#7A6F64;display:block}
@@ -40,10 +40,9 @@ input,textarea,select{font-family:inherit;font-size:14px;color:var(--ink)}
 .nav-group>i{display:block;font-style:normal;font-size:10.5px;letter-spacing:2px;color:#6E645A;padding:0 10px 6px}
 .nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border-radius:9px;color:var(--side-txt);font-size:13.5px;text-align:left;position:relative;transition:background .15s,color .15s}
 .nav-item:hover{background:rgba(255,255,255,.06);color:#EDE7E0}
-.nav-item.active{background:rgba(217,52,43,.18);color:#fff;font-weight:600}
+.nav-item.active{background:rgba(230,0,18,.2);color:#fff;font-weight:600}
 .nav-item.active::before{content:'';position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:2px;background:var(--red)}
 .nav-item .bdg{margin-left:auto;background:var(--red);color:#fff;font-size:11px;font-weight:700;border-radius:99px;padding:0 7px;line-height:18px}
-.nav-item.locked{opacity:.38;cursor:not-allowed}
 .side-fill{flex:1;min-height:18px}
 .side-persona{border-top:1px solid rgba(255,255,255,.08);padding:14px 14px 16px}
 .side-persona>i{font-style:normal;display:block;font-size:10.5px;letter-spacing:2px;color:#6E645A;margin-bottom:9px}
@@ -81,7 +80,7 @@ input,textarea,select{font-family:inherit;font-size:14px;color:var(--ink)}
 .btn:hover{transform:translateY(-1px)}
 .btn:active{transform:none}
 .btn.red{background:var(--red)}
-.btn.red:hover{background:#C42D24}
+.btn.red:hover{background:#C70010}
 .btn.ghost{background:transparent;color:var(--ink-2);border:1px solid var(--line-2)}
 .btn.ghost:hover{border-color:var(--muted);color:var(--ink)}
 .btn.sm{padding:6px 13px;font-size:12.5px;border-radius:8px}
@@ -102,18 +101,19 @@ input,textarea,select{font-family:inherit;font-size:14px;color:var(--ink)}
 .field>label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
 .field>label em{font-style:normal;color:var(--red);margin-left:2px}
 .ipt{width:100%;border:1px solid var(--line-2);border-radius:var(--radius-sm);padding:8.5px 12px;background:var(--card);transition:border-color .15s,box-shadow .15s}
-.ipt:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(217,52,43,.1);outline:none}
+.ipt:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(230,0,18,.09);outline:none}
 .ipt:disabled{background:var(--paper);color:var(--muted);cursor:not-allowed}
 textarea.ipt{resize:vertical;line-height:1.7}
 .hint{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.5}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1.1fr 1.3fr 1.1fr;gap:12px}
 .banner{display:flex;gap:10px;align-items:flex-start;border-radius:var(--radius);padding:12px 16px;font-size:13px;margin-bottom:18px;border:1px solid}
 .banner .ic{margin-top:2px}
 .banner.amber{background:var(--amber-soft);border-color:var(--amber-line);color:#7A5510}
 .banner.ink{background:#EFEBE6;border-color:var(--line-2);color:var(--ink-2)}
-.banner.red{background:var(--red-soft);border-color:var(--red-line);color:var(--red-ink)}
+.banner.red{background:var(--red-soft);border-color:var(--red-line);color:var(--red-deep)}
 
-/* ============ 冲刺卡视图 ============ */
+/* ============ 表单区 ============ */
 .card-layout{display:grid;grid-template-columns:470px 1fr;gap:26px;align-items:start}
 .form-panel{padding:22px 24px}
 .seq-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -124,73 +124,76 @@ textarea.ipt{resize:vertical;line-height:1.7}
 .seq-chip:hover{border-color:var(--muted)}
 .seq-chip.on{border-color:var(--red);background:var(--red-soft);box-shadow:0 0 0 1px var(--red) inset}
 .seq-chip.on .ic,.seq-chip.on b{color:var(--red-deep)}
-.path-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
-.path-row .no{width:24px;height:24px;flex:none;border-radius:7px;background:var(--paper);border:1px solid var(--line);font-size:11.5px;font-weight:700;color:var(--ink-2);display:flex;align-items:center;justify-content:center}
-.path-row .rm{width:26px;height:26px;flex:none;border-radius:7px;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all .15s}
-.path-row .rm:hover{color:var(--red);background:var(--red-soft)}
-.path-row .rm .ic{width:14px;height:14px}
+.must-note{background:var(--amber-soft);border:1px solid var(--amber-line);border-radius:9px;padding:9px 13px;font-size:12px;color:#7A5510;line-height:1.7;margin:10px 0 14px}
+.item-row{display:grid;grid-template-columns:30px 1fr 118px;gap:10px;align-items:center;margin-bottom:9px}
+.item-row .no{width:26px;height:26px;border-radius:8px;background:var(--red-soft);border:1px solid var(--red-line);color:var(--red-deep);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;font-style:italic}
+.item-row .it-name{font-size:13px;font-weight:600;line-height:1.45}
+.item-row .it-name small{font-weight:400;color:var(--muted)}
+.item-row input{width:100%;border:1px solid var(--line-2);border-radius:8px;padding:8px 10px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;transition:border-color .15s,box-shadow .15s}
+.item-row input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(230,0,18,.09);outline:none}
+.item-row .uwrap{position:relative}
+.item-row .uwrap span{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);pointer-events:none}
+.item-row .uwrap input{padding-right:44px}
+.fill-guide{margin-top:16px;border:1px dashed var(--line-2);border-radius:9px;padding:11px 14px;font-size:11.5px;color:var(--ink-2);line-height:1.8;background:#FBFAF8}
+.fill-guide b{color:var(--ink)}
 .form-actions{display:flex;gap:10px;margin-top:20px;padding-top:18px;border-top:1px dashed var(--line-2)}
-
 .timeline{display:flex;align-items:flex-start;margin-bottom:18px}
 .tl-step{flex:1;text-align:center;position:relative}
 .tl-step .nd{width:26px;height:26px;border-radius:50%;border:2px solid var(--line-2);background:var(--card);color:var(--muted);display:flex;align-items:center;justify-content:center;margin:0 auto 7px;font-size:12px;font-weight:700;position:relative;z-index:1}
 .tl-step.done .nd{border-color:var(--red);background:var(--red);color:#fff}
-.tl-step.now .nd{border-color:var(--red);color:var(--red-deep);box-shadow:0 0 0 4px rgba(217,52,43,.12)}
+.tl-step.now .nd{border-color:var(--red);color:var(--red-deep);box-shadow:0 0 0 4px rgba(230,0,18,.1)}
 .tl-step b{display:block;font-size:12px;color:var(--muted);font-weight:600}
 .tl-step.done b,.tl-step.now b{color:var(--ink)}
 .tl-step small{display:block;font-size:10.5px;color:var(--muted)}
 .tl-step::before{content:'';position:absolute;top:13px;left:-50%;width:100%;height:2px;background:var(--line-2)}
 .tl-step.done::before{background:var(--red)}
 .tl-step:first-child::before{display:none}
-
 .preview-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;position:sticky;top:0}
 .preview-tip{font-size:11.5px;color:var(--muted);letter-spacing:.5px}
 .export-row{display:flex;gap:10px}
 
-/* ============ 冲刺卡（实体卡片） ============ */
+/* ============ 达标冲刺目标卡（实体卡片，按官方 Word 模板） ============ */
 .scard{width:460px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;position:relative;box-shadow:var(--shadow-card);font-size:14px}
-.sc-head{position:relative;color:#fff;padding:18px 22px 20px;background:linear-gradient(135deg,#DE3A2F 0%,#B7261C 78%);overflow:hidden}
-.sc-head::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.055) 0 10px,transparent 10px 20px);pointer-events:none}
-.sc-head-top{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:1.5px;opacity:.82;margin-bottom:10px;position:relative;z-index:1}
-.sc-head-main{display:flex;justify-content:space-between;align-items:flex-end;position:relative;z-index:1}
-.sc-title{font-size:29px;font-weight:900;letter-spacing:3px;line-height:1.15;text-shadow:0 2px 10px rgba(0,0,0,.14)}
-.sc-eng{font-size:10px;letter-spacing:5px;opacity:.75;margin-top:2px}
-.sc-seq{display:inline-flex;align-items:center;gap:6px;margin-top:11px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(2px);border-radius:99px;padding:3.5px 12px;font-size:12px;font-weight:600}
-.sc-seq .ic{width:14px;height:14px}
-.sc-seq i{font-style:normal;font-weight:400;opacity:.8;font-size:11px}
-.sc-bigq{font-size:62px;font-weight:900;line-height:.9;color:transparent;-webkit-text-stroke:1.6px rgba(255,255,255,.8);letter-spacing:-3px;font-style:italic}
-.sc-body{padding:20px 22px 18px}
-.sc-id{display:flex;align-items:center;gap:13px;padding-bottom:16px;border-bottom:1px dashed var(--line-2)}
-.sc-avatar{width:47px;height:47px;flex:none;border-radius:50%;background:var(--red-soft);border:1.5px solid var(--red-line);color:var(--red-deep);font-size:19px;font-weight:800;display:flex;align-items:center;justify-content:center}
-.sc-id-main{flex:1;min-width:0}
-.sc-name{font-size:21px;font-weight:800;letter-spacing:1px;line-height:1.25}
-.sc-name .sc-code{font-size:11px;font-family:var(--mono);color:var(--muted);font-weight:400;margin-left:8px;letter-spacing:.5px}
-.sc-dept{font-size:12px;color:var(--ink-2);margin-top:1px}
-.sc-ok-tag{flex:none;align-self:flex-start;font-size:10.5px;font-weight:700;color:var(--red-deep);border:1px solid var(--red);border-radius:6px;padding:2px 8px;letter-spacing:2px;transform:rotate(3deg)}
-.sc-sec{margin-top:16px}
-.sc-sec-label{display:flex;align-items:baseline;gap:8px;margin-bottom:9px}
+.sc-banner{display:block;width:100%;height:auto}
+.sc-titlebar{background:linear-gradient(120deg,#F0101C,#B0000E);color:#fff;padding:13px 20px 12px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden}
+.sc-titlebar::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 10px,transparent 10px 20px);pointer-events:none}
+.sc-t1{font-size:19px;font-weight:900;letter-spacing:2.5px;text-shadow:0 2px 8px rgba(0,0,0,.15);position:relative;z-index:1}
+.sc-t2{font-size:10.5px;letter-spacing:2px;opacity:.88;margin-top:3px;position:relative;z-index:1}
+.sc-q4{font-size:34px;font-weight:900;font-style:italic;line-height:.9;color:transparent;-webkit-text-stroke:1.4px rgba(255,255,255,.85);letter-spacing:-1px;position:relative;z-index:1}
+.sc-body{padding:16px 20px 15px}
+.sc-info{display:grid;grid-template-columns:1.1fr 1.35fr 1.15fr;background:var(--info-bg);border:1px solid var(--line-2);border-radius:9px;overflow:hidden}
+.sc-info .cell{padding:8px 13px;border-right:1px solid var(--line-2)}
+.sc-info .cell:last-child{border-right:none}
+.sc-info .cell span{display:block;font-size:9.5px;color:var(--muted);letter-spacing:2.5px;margin-bottom:1px}
+.sc-info .cell b{font-size:13.5px;letter-spacing:.5px}
+.sc-sec-label{display:flex;align-items:baseline;gap:8px;margin:15px 0 8px}
 .sc-sec-label::before{content:'';width:7px;height:7px;border-radius:2px;background:var(--red);align-self:center}
 .sc-sec-label b{font-size:13.5px;font-weight:800;letter-spacing:1px}
 .sc-sec-label span{font-size:9.5px;letter-spacing:3px;color:var(--muted)}
-.sc-goal{display:flex;gap:10px;padding:7px 0}
-.sc-goal .gno{font-size:17px;font-weight:900;color:var(--red);font-style:italic;line-height:1.35;flex:none;width:26px}
-.sc-goal p{font-size:13.5px;font-weight:600;line-height:1.55;color:var(--ink)}
-.sc-goal p em{font-style:normal;color:var(--red-deep)}
-.sc-path{position:relative;margin-left:3px}
-.sc-path::before{content:'';position:absolute;left:4.5px;top:8px;bottom:8px;width:1.5px;background:var(--line-2)}
-.sc-step{display:flex;gap:11px;padding:4.5px 0;position:relative}
-.sc-step .pd{width:10px;height:10px;flex:none;border-radius:50%;background:var(--red);border:2.5px solid #fff;box-shadow:0 0 0 1.5px var(--red);margin-top:5px}
-.sc-step p{font-size:12.5px;color:var(--ink-2);line-height:1.55;font-weight:500}
-.sc-sign{display:flex;margin-top:18px;border-top:1px dashed var(--line-2);padding-top:13px;gap:14px}
+.sc-sec-label i{font-style:normal;font-size:10px;color:var(--muted);margin-left:auto;font-weight:400}
+.sc-gtable{border:1.5px solid var(--red-line);border-radius:9px;overflow:hidden}
+.sc-ghead{display:flex;gap:10px;align-items:center;background:var(--red-soft);color:var(--red-deep);padding:6.5px 14px;font-size:11px;font-weight:800;letter-spacing:1.5px}
+.sc-ghead .h-no{width:26px}
+.sc-ghead .h-t{flex:1}
+.sc-ghead .h-v{width:74px;text-align:right}
+.sc-grow{display:flex;gap:10px;align-items:center;padding:8px 14px;border-top:1px solid #F7E0E1}
+.sc-grow:first-of-type{border-top:none}
+.sc-grow .gno{width:26px;flex:none;font-size:16px;font-weight:900;font-style:italic;color:var(--red);line-height:1.2}
+.sc-grow .gt{flex:1;font-size:12.5px;font-weight:600;line-height:1.5}
+.sc-grow .gv{width:74px;flex:none;text-align:right;font-size:16.5px;font-weight:800;color:var(--red-deep);white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1.2}
+.sc-grow .gv i{font-style:normal;font-size:10px;font-weight:600;opacity:.75;margin-left:1px}
+.sc-grow .gv.empty{color:#C9BFB4;font-size:11px;font-weight:500;letter-spacing:1px}
+.sc-words{margin-top:13px;background:var(--red-paper);border-left:3px solid var(--red);border-radius:0 9px 9px 0;padding:9px 14px;font-size:11px;color:#8C5B60;line-height:1.9}
+.sc-sign{display:flex;margin-top:13px;border-top:1px dashed var(--line-2);padding-top:11px;gap:14px}
 .sc-sign-cell{flex:1}
-.sc-sign-cell span{display:block;font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-bottom:3px}
-.sc-sign-cell b{display:block;font-size:14.5px;font-weight:700;letter-spacing:2px}
+.sc-sign-cell span{display:block;font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px}
+.sc-sign-cell b{display:block;font-size:14px;font-weight:700;letter-spacing:2px}
 .sc-sign-cell b.pending{color:var(--amber);font-size:12px;font-weight:600;letter-spacing:.5px}
 .sc-sign-cell i{font-style:normal;font-size:10.5px;color:var(--muted);font-family:var(--mono)}
-.sc-foot{display:flex;align-items:center;justify-content:space-between;margin-top:15px;padding-top:12px;border-top:1px solid var(--line)}
+.sc-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
 .sc-foot span{font-size:9.5px;letter-spacing:1.5px;color:var(--muted);font-family:var(--mono)}
 .sc-bar{width:118px;height:22px;background:repeating-linear-gradient(90deg,var(--ink) 0 1.5px,transparent 1.5px 4px,var(--ink) 4px 5.5px,transparent 5.5px 9px,var(--ink) 9px 12px,transparent 12px 14px);opacity:.75}
-.sc-seal{position:absolute;right:26px;top:56.5%;width:112px;height:112px;color:#C4271E;opacity:.94;transform:rotate(-13deg);pointer-events:none;mix-blend-mode:multiply}
+.sc-seal{position:absolute;right:24px;top:58%;width:112px;height:112px;color:#B80010;opacity:.94;transform:rotate(-13deg);pointer-events:none;mix-blend-mode:multiply}
 .scard.is-locked .sc-seal{animation:stamp .45s cubic-bezier(.2,1.6,.4,1)}
 @keyframes stamp{0%{transform:rotate(-13deg) scale(1.9);opacity:0}60%{opacity:.94}100%{transform:rotate(-13deg) scale(1)}}
 .scard.empty-state{border-style:dashed;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);min-height:560px;background:transparent}
@@ -229,7 +232,7 @@ textarea.ipt{resize:vertical;line-height:1.7}
 .delta.up{color:var(--ok);background:var(--ok-soft)}
 .delta.flat{color:var(--muted);background:var(--paper)}
 .gc-bar{height:9px;border-radius:99px;background:var(--paper);border:1px solid var(--line);position:relative;overflow:hidden}
-.gc-bar .fill{position:absolute;inset:0;width:0;border-radius:99px;background:linear-gradient(90deg,#E2483D,var(--red-deep));transition:width .6s ease}
+.gc-bar .fill{position:absolute;inset:0;width:0;border-radius:99px;background:linear-gradient(90deg,#F0101C,var(--red-deep));transition:width .6s ease}
 .gc-bar .tick{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--line-2)}
 .gc-note{margin-top:10px;font-size:12px;color:var(--ink-2);background:var(--paper);border-radius:8px;padding:8px 11px;line-height:1.6}
 .gc-note b{color:var(--ink);font-weight:600}
@@ -263,13 +266,13 @@ textarea.ipt{resize:vertical;line-height:1.7}
 .slider-row{display:grid;grid-template-columns:1fr 130px;gap:14px;align-items:center;margin-bottom:12px}
 .slider-row .sr-name{font-size:12.5px;font-weight:600;line-height:1.4}
 input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:99px;background:var(--line-2);outline-offset:6px}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--red);border:3px solid #fff;box-shadow:0 1px 5px rgba(178,36,28,.5);cursor:grab}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--red);border:3px solid #fff;box-shadow:0 1px 5px rgba(168,0,11,.5);cursor:grab}
 .sr-val{display:flex;align-items:center;gap:4px;justify-content:flex-end}
 .sr-val input{width:52px;border:1px solid var(--line-2);border-radius:7px;padding:4px 6px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
 .sr-val span{font-size:12px;color:var(--muted)}
 .editor-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
 
-/* ============ 审核台 ============ */
+/* ============ 团队目标卡 ============ */
 .sum-chips{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
 .sum-chip{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 18px}
 .sum-chip b{font-size:22px;font-weight:800;line-height:1}
@@ -295,7 +298,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .stat .st-num small{font-size:13px;color:var(--muted);font-weight:500;letter-spacing:0}
 .stat .st-sub{font-size:11px;color:var(--muted)}
 .mini-bar{height:7px;border-radius:99px;background:var(--paper);border:1px solid var(--line);overflow:hidden;margin-top:9px}
-.mini-bar i{display:block;height:100%;background:linear-gradient(90deg,#E2483D,var(--red-deep));border-radius:99px}
+.mini-bar i{display:block;height:100%;background:linear-gradient(90deg,#F0101C,var(--red-deep));border-radius:99px}
 table.bp{width:100%;border-collapse:collapse}
 table.bp th{font-size:11.5px;color:var(--muted);text-align:left;font-weight:600;padding:11px 14px;border-bottom:1px solid var(--line);letter-spacing:.5px;white-space:nowrap}
 table.bp td{padding:13px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
@@ -325,6 +328,10 @@ td .mono{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .matrix .y{color:var(--ok);font-weight:700}
 .matrix .n{color:#C9BFB4}
 .matrix .p{color:var(--amber);font-weight:600;font-size:11.5px}
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px}
+.cmp-table th,.cmp-table td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top;line-height:1.7}
+.cmp-table th{background:var(--red-soft);color:var(--red-deep);font-size:11.5px;letter-spacing:1px;white-space:nowrap}
+.cmp-table td:first-child{font-weight:700;white-space:nowrap;background:#FBFAF8}
 .guide{counter-reset:g}
 .guide li{list-style:none;position:relative;padding:7px 0 7px 34px;font-size:13.5px;color:var(--ink-2);border-bottom:1px dashed var(--line)}
 .guide li:last-child{border:none}
@@ -383,6 +390,7 @@ td .mono{font-family:var(--mono);font-size:12px;color:var(--muted)}
       <section class="view" id="view-card"></section>
       <section class="view" id="view-board"></section>
       <section class="view" id="view-review"></section>
+      <section class="view" id="view-edit"></section>
       <section class="view" id="view-bp"></section>
     </div>
   </main>
@@ -394,13 +402,17 @@ td .mono{font-family:var(--mono);font-size:12px;color:var(--muted)}
 <script>
 /* ================================================================
    冲刺目标跟踪系统 · 高保真交互原型（无后端，数据存于内存+localStorage）
+   目标卡按《四季度达标冲刺目标卡》官方 Word 模板实现：
+     - 一人一卡，由部门主管填写后直接下发到人，无需员工回签
+     - 目标项按序列统一口径（目标项与目标值），值由经营目标倒推分解
    角色权限：
-     员工    —— 填写本人冲刺卡；仅查看本部门看板
-     部门负责人 —— 审核锁定成员目标卡；填写部门目标；每周更新进度
-     BP/人力  —— 全公司确认率统计、提醒、全部看板只读
+     员工    —— 查看（主管下发的）本人目标卡；仅查看本部门看板
+     部门负责人 —— 填写并下发成员目标卡；填写部门目标；每周更新进度
+     BP/人力  —— 全公司下发率统计、提醒、全部看板只读
 ================================================================ */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const BANNER="data:image/png;base64,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";
 
 /* ---------- 图标库（线性 SVG） ---------- */
 const ICONS={
@@ -414,7 +426,6 @@ edit:'<path d="M16.8 3.8l3.4 3.4L8 19.4l-4.6 1.2 1.2-4.6L16.8 3.8z"/>',
 down:'<path d="M12 3v12"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M4 20h16"/>',
 print:'<path d="M6.5 9V3.5h11V9"/><path d="M6.5 17.5H5a2 2 0 01-2-2v-4.5a2 2 0 012-2h14a2 2 0 012 2v4.5a2 2 0 01-2 2h-1.5"/><path d="M6.5 14.5h11v6h-11z"/>',
 plus:'<path d="M12 5v14M5 12h14"/>',
-trash:'<path d="M4 6.5h16"/><path d="M9 6.5V4h6v2.5"/><path d="M6.5 6.5l1 14h9l1-14"/><path d="M10 10.5v6M14 10.5v6"/>',
 x:'<path d="M6 6l12 12M18 6L6 18"/>',
 bell:'<path d="M18 8.5a6 6 0 10-12 0c0 6.5-2.5 8-2.5 8h17s-2.5-1.5-2.5-8"/><path d="M10.3 20.5a2 2 0 003.4 0"/>',
 eye:'<path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.6"/>',
@@ -431,31 +442,32 @@ grid:'<rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.5"/><rect x="13" y="3
 back:'<path d="M9 15l-4-5 4-5"/><path d="M5 10h9a5 5 0 015 5v1"/>',
 info:'<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><path d="M12 7.8v.4"/>',
 cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/>',
-refresh:'<path d="M20.5 12a8.5 8.5 0 11-2.5-6L20.5 8"/><path d="M20.5 3v5h-5"/>',
-send:'<path d="M21 3L10.5 13.5"/><path d="M21 3l-6.8 18-3.7-7.5L3 9.8 21 3z"/>'
+send:'<path d="M21 3L10.5 13.5"/><path d="M21 3l-6.8 18-3.7-7.5L3 9.8 21 3z"/>',
+book:'<path d="M4 4.5A2.5 2.5 0 016.5 2H20v17.5H6.5A2.5 2.5 0 004 22V4.5z"/><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>'
 };
 const ic=(n,st='')=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ${st?`style="${st}"`:''}>${ICONS[n]||ICONS.info}</svg>`;
 
-/* ---------- 序列模板 ---------- */
+/* ---------- 序列与官方统一目标项口径（源自《四季度达标冲刺目标卡》对照表） ---------- */
 const SEQ=[
- {id:'impl',  name:'实施序列', sub:'项目进度 · 权责', icon:'gear',   hint:'例：重点项目按期交付率 100%、验收回款 ¥500 万、权责落实到人'},
- {id:'bizdev',name:'客开序列', sub:'新客突破',        icon:'target', hint:'例：新客签约 8 家、商机储备 ¥2000 万、打造标杆客户 2 个'},
- {id:'cs',    name:'客户成功', sub:'续费 · 增购',     icon:'heart',  hint:'例：续费率 ≥90%、增购金额 ¥150 万、NPS ≥45'},
- {id:'sales', name:'销售',     sub:'签约 · 回款',     icon:'trend',  hint:'例：签约 ¥800 万、回款率 95%、新客户 6 家'},
- {id:'pre',   name:'售前',     sub:'方案 · 赢单',     icon:'doc',    hint:'例：支持方案 25 单、关键赢单率提升 10%、沉淀标杆方案 3 个'},
- {id:'hr',    name:'人力',     sub:'组织 · 人效',     icon:'users',  hint:'例：关键岗位到岗率 100%、核心人才保留 ≥95%、人均培训 40h'},
- {id:'fin',   name:'财务',     sub:'预算 · 应收',     icon:'yen',    hint:'例：应收周转 ≤45 天、预算偏差 ≤5%、月结 T+3 出报表'},
- {id:'mkt',   name:'市场',     sub:'线索 · 品牌',     icon:'mega',   hint:'例：有效线索 300 条、市场活动 ROI ≥3、品牌曝光 500 万'},
- {id:'sm',    name:'销管',     sub:'商机 · 合规',     icon:'funnel', hint:'例：商机转化率 25%、销售流程合规 100%、数据及时准确率 98%'},
- {id:'pmo',   name:'PMO',      sub:'里程碑 · 效率',   icon:'grid',   hint:'例：里程碑达成率 95%、交付周期缩短 10%、项目复盘覆盖 100%'},
+ {id:'sales', name:'销售序列',        sub:'签约 · 回款',      icon:'trend',  items:[{t:'本季度回款目标',u:'万元'},{t:'本季度合同签约目标',u:'万元'}], must:1},
+ {id:'pre',   name:'售前序列',        sub:'方案 · 赢单',      icon:'doc',    items:[{t:'本季度签约目标',u:'万元'},{t:'支持投标项目数',u:'个'},{t:'重点客户方案交流场次',u:'场'}]},
+ {id:'impl',  name:'实施序列',        sub:'上线 · 验收 · 回款',icon:'gear',  items:[{t:'按计划上线（验收）项目数',u:'个'},{t:'里程碑按计划达成率',u:'%'},{t:'验收回款金额',u:'万元'},{t:'项目交付质量与客户满意度',u:'%'}]},
+ {id:'bizdev',name:'客开序列',        sub:'定制交付 · 产品化',icon:'target', items:[{t:'客户化定制开发需求交付（验收）项数',u:'个'},{t:'开发任务按计划交付及时率',u:'%'},{t:'交付质量：一次验收通过率',u:'%'},{t:'定制成果产品化沉淀项数',u:'个'}]},
+ {id:'cs',    name:'客户成功序列',    sub:'续费 · SLA',       icon:'heart',  items:[{t:'服务收款目标',u:'万元'},{t:'订阅（续订）业务收入目标',u:'万元'},{t:'运维服务SLA与驻场服务履约达标率',u:'%'},{t:'客户满意度评分',u:'分'}]},
+ {id:'mkt',   name:'市场序列',        sub:'活动 · 线索',      icon:'mega',   items:[{t:'市场活动落地场次',u:'场'},{t:'有效线索（MQL）数',u:'条'},{t:'标杆案例产出数',u:'篇'},{t:'案例与内容传播曝光量',u:'次'}]},
+ {id:'fin',   name:'财务序列',        sub:'预算 · 月结',      icon:'yen',    items:[{t:'回款与收入确认及时率',u:'%'},{t:'月结与报表按时完成率',u:'%'},{t:'预算执行偏差率',u:'%'},{t:'四季度经营分析报告输出',u:'份'}]},
+ {id:'hr',    name:'人力资源序列',    sub:'到岗 · 关怀',      icon:'users',  items:[{t:'部门关键岗位到岗率',u:'%'},{t:'员工关怀及时率',u:'%'},{t:'冲刺氛围落地项',u:'场'}]},
+ {id:'sm',    name:'销售管理序列',    sub:'数据 · 漏斗',      icon:'funnel', items:[{t:'签约与回款数据准确、及时率',u:'%'},{t:'商机漏斗预测准确率',u:'%'}]},
+ {id:'pmo',   name:'项目管理序列（PMO）',sub:'里程碑 · 风险', icon:'grid',   items:[{t:'里程碑按计划达成率',u:'%'},{t:'项目风险闭环率',u:'%'},{t:'资源利用率',u:'%'},{t:'重点项目交付验收数',u:'个'}]},
 ];
 const seqOf=id=>SEQ.find(s=>s.id===id)||SEQ[0];
+const WORDS='年终收官冲刺，愿你迎难而上、突破瓶颈，圆满达成个人目标，与团队并肩交出亮眼的年终答卷！胜利属于每一位全力以赴的奋斗者！';
 
 /* ---------- 季度 ---------- */
 const Q={year:2026,label:'2026 第四季度',current:2,
  weeks:[1,2,3,4,5,6,7,8,9,10,11,12,13].map(n=>({n,range:['10.01–10.09','10.10–10.16','10.17–10.23','10.24–10.30','10.31–11.06','11.07–11.13','11.14–11.20','11.21–11.27','11.28–12.04','12.05–12.11','12.12–12.18','12.19–12.25','12.26–12.31'][n-1]}))};
 
-/* ---------- 人员与目标卡数据 ---------- */
+/* ---------- 人员与目标卡数据（items: 目标项与目标值） ---------- */
 const DB={
  people:{
   zm:{id:'zm',name:'张明',code:'EMP0231',dept:'实施交付部',deptId:'impl',role:'employee',roleName:'部门员工'},
@@ -463,23 +475,14 @@ const DB={
   wf:{id:'wf',name:'王芳',code:'EMP0017',dept:'人力资源部',deptId:'hr',role:'bp',roleName:'HRBP'},
  },
  cards:{
-  zm:{name:'张明',code:'EMP0231',dept:'实施交付部',seq:'impl',status:'draft',
-      goals:'重点项目按期交付率 100%（3 个项目）\n季度推动验收回款 ¥500 万，权责落实到人',
-      path:['里程碑倒排，周例会跟踪风险','交付物模板化，验收标准前置对齐','回款节点与客户双周沟通对账','问题升级 24 小时响应机制'],savedAt:'10.08 14:20'},
-  lq:{name:'李强',code:'EMP0102',dept:'实施交付部',seq:'impl',status:'confirmed',
-      goals:'部门人均交付效率提升 15%\n季度项目按期率 100%、零重大权责事故',
-      path:['推行项目看板周更机制','关键节点亲自把关','每月一次交付复盘'],submittedAt:'10.09',confirmedAt:'10.10',confirmedBy:'王芳（上级）'},
-  wf:{name:'王芳',code:'EMP0017',dept:'人力资源部',seq:'hr',status:'draft',goals:'',path:[''],savedAt:''},
-  cc:{name:'陈晨',code:'EMP0245',dept:'实施交付部',seq:'impl',status:'submitted',
-      goals:'B 项目设计评审一次通过\n交付物模板复用率提升至 60%',
-      path:['评审前内部预审两轮','沉淀标准交付物模板库'],submittedAt:'10.14'},
-  zk:{name:'周凯',code:'EMP0233',dept:'实施交付部',seq:'impl',status:'submitted',
-      goals:'C 项目里程碑偏差 ≤3 天\n客户满意度 ≥4.6 / 5',
-      path:['里程碑预警提前 5 天','每月客户满意度回访'],submittedAt:'10.15'},
-  ly:{name:'刘洋',code:'EMP0219',dept:'实施交付部',seq:'impl',status:'confirmed',
-      goals:'A 项目 11.30 前按期验收\n负责项目零安全、零延期事故',
-      path:['验收标准月初对齐','每周五向客户同步进度'],submittedAt:'10.09',confirmedAt:'10.12',confirmedBy:'李强'},
-  zx:{name:'赵雪',code:'EMP0258',dept:'实施交付部',seq:'impl',status:'blank',goals:'',path:['']},
+  /* status: blank 未填写 / draft 主管填写中 / issued 已下发（锁定） */
+  zm:{name:'张明',code:'EMP0231',dept:'实施交付部',seq:'impl',status:'draft',items:[{v:'3'},{v:'100'},{v:'500'},{v:'96'}],savedAt:'10.16 09:40'},
+  lq:{name:'李强',code:'EMP0102',dept:'实施交付部',seq:'impl',status:'issued',items:[{v:'8'},{v:'100'},{v:'1200'},{v:'95'}],issuedAt:'10.09',issuedBy:'分管副总'},
+  wf:{name:'王芳',code:'EMP0017',dept:'人力资源部',seq:'hr',status:'blank',items:[]},
+  cc:{name:'陈晨',code:'EMP0245',dept:'实施交付部',seq:'impl',status:'draft',items:[{v:'2'},{v:'100'},{v:'180'},{v:'95'}],savedAt:'10.15 16:20'},
+  zk:{name:'周凯',code:'EMP0233',dept:'实施交付部',seq:'impl',status:'issued',items:[{v:'2'},{v:'100'},{v:'120'},{v:'95'}],issuedAt:'10.12',issuedBy:'李强'},
+  ly:{name:'刘洋',code:'EMP0219',dept:'实施交付部',seq:'impl',status:'issued',items:[{v:'2'},{v:'100'},{v:'260'},{v:'97'}],issuedAt:'10.10',issuedBy:'李强'},
+  zx:{name:'赵雪',code:'EMP0258',dept:'实施交付部',seq:'impl',status:'blank',items:[]},
  },
  team:['zm','cc','zk','ly','zx'], // 实施交付部成员（李强本人除外）
  depts:[
@@ -508,19 +511,18 @@ const DB={
 };
 
 /* ---------- 运行状态 ---------- */
-const S={route:'card',persona:'zm',selDept:'impl',selWeek:Q.current,editWeek:false,editDept:false};
+const S={route:'card',persona:'zm',selDept:'impl',selWeek:Q.current,editWeek:false,editMember:null};
 
 /* ---------- 持久化 ---------- */
-const LSKEY='sprint-proto-v1';
+const LSKEY='sprint-proto-v2';
 function save(){try{localStorage.setItem(LSKEY,JSON.stringify({cards:DB.cards,depts:DB.depts.map(d=>({id:d.id,head:d.head,goals:d.goals,path:d.path,weeks:d.weeks,hasBoard:d.hasBoard,lastAt:d.lastAt}))}))}catch(e){}}
 function load(){try{const j=JSON.parse(localStorage.getItem(LSKEY)||'null');if(!j)return;Object.assign(DB.cards,j.cards||{});(j.depts||[]).forEach(sd=>{const d=DB.depts.find(x=>x.id===sd.id);if(d)Object.assign(d,sd)})}catch(e){}}
 
 /* ---------- 工具 ---------- */
 const person=()=>DB.people[S.persona];
 const myCard=()=>DB.cards[S.persona];
-const goalsOf=c=>String(c.goals||'').split('\n').map(s=>s.trim()).filter(Boolean);
-const pathsOf=c=>(c.path||[]).map(s=>s.trim()).filter(Boolean);
 const deptOf=id=>DB.depts.find(d=>d.id===id);
+const cardItems=c=>{const seq=seqOf(c.seq);return (c.items&&c.items.length?c.items:seq.items.map(()=>({v:''}))).map((it,i)=>({t:seq.items[i]?seq.items[i].t:'目标项',u:seq.items[i]?seq.items[i].u:'',v:it.v||''}))};
 const latestPct=(d,w,gi)=>{for(let k=w;k>=1;k--){if(d.weeks[k])return d.weeks[k].pct[gi]??0}return 0};
 const hasData=(d,w)=>!!d.weeks[w];
 const fmtW=n=>`第 ${n} 周`;
@@ -528,141 +530,206 @@ function toast(msg,warn){const t=document.createElement('div');t.className='toas
 
 /* ---------- 权限 ---------- */
 const PERM={
- canEditCard:()=>{const c=myCard();return c.status==='draft'},
- canSubmit:()=>myCard().status==='draft',
- canReview:()=>person().role==='head',
+ canTeam:()=>person().role==='head',
  canBP:()=>person().role==='bp',
  canEditBoard:d=>person().role==='head'&&person().deptId===d.id,
  visibleDepts:()=>{const p=person();if(p.role==='employee')return DB.depts.filter(d=>d.id===p.deptId);return DB.depts},
  canSwitchDept:d=>{const p=person();return p.role!=='employee'||d.id===p.deptId},
 };
 
-/* ============ 冲刺卡（实体卡片渲染） ============ */
+/* ============ 达标冲刺目标卡（实体卡片渲染） ============ */
 function sealSVG(date){return `
 <svg class="sc-seal" viewBox="0 0 120 120">
   <defs><path id="sealc" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/></defs>
   <circle cx="60" cy="60" r="55.5" fill="none" stroke="currentColor" stroke-width="3.2"/>
   <circle cx="60" cy="60" r="39" fill="none" stroke="currentColor" stroke-width="1.4"/>
-  <text font-size="11" letter-spacing="2.5" fill="currentColor" font-weight="600"><textPath href="#sealc" startOffset="2%">部门负责人已审核确认 · 锁定</textPath></text>
+  <text font-size="11" letter-spacing="2.5" fill="currentColor" font-weight="600"><textPath href="#sealc" startOffset="2%">部门主管已签发 · 下发到人</textPath></text>
   <path d="M60 36l2.1 4.3 4.7.6-3.4 3.3.8 4.7-4.2-2.2-4.2 2.2.8-4.7-3.4-3.3 4.7-.6z" fill="currentColor"/>
-  <text x="60" y="63" text-anchor="middle" font-size="19" font-weight="800" fill="currentColor" letter-spacing="2">已确认</text>
+  <text x="60" y="63" text-anchor="middle" font-size="19" font-weight="800" fill="currentColor" letter-spacing="2">已下发</text>
   <text x="60" y="78" text-anchor="middle" font-size="9" fill="currentColor" letter-spacing="1">${esc(date||'')}</text>
 </svg>`}
 
 function cardHTML(pid,uid){
   const c=DB.cards[pid];if(!c)return'';
-  if(c.status==='blank'||(!goalsOf(c).length&&!pathsOf(c).length&&c.status==='draft'&&!c.savedAt))
-    return `<div class="scard empty-state">${ic('edit')}<b style="font-size:14px">尚未填写冲刺目标卡</b><span style="font-size:12px">选择序列后开始填写，完成后即可提交确认</span></div>`;
   const seq=seqOf(c.seq);
-  const goals=goalsOf(c);const paths=pathsOf(c);
+  const items=cardItems(c);
+  if(c.status==='blank'||!items.some(i=>i.v))
+    return `<div class="scard empty-state">${ic('edit')}<b style="font-size:14px">目标卡待填写</b><span style="font-size:12px">由部门主管选择序列、填写目标值后下发</span></div>`;
   return `
-  <div class="scard ${c.status==='confirmed'?'is-locked':''}" id="scard-${uid}">
-    <div class="sc-head">
-      <div class="sc-head-top"><span>2026 · 第四季度</span><span>冲刺周期 10.01 – 12.31</span></div>
-      <div class="sc-head-main">
-        <div>
-          <div class="sc-title">冲刺目标卡</div>
-          <div class="sc-eng">SPRINT GOAL CARD</div>
-          <div class="sc-seq">${ic(seq.icon)}${seq.name}<i>· ${seq.sub}</i></div>
-        </div>
-        <div class="sc-bigq">Q4</div>
+  <div class="scard ${c.status==='issued'?'is-locked':''}" id="scard-${uid}">
+    <img class="sc-banner" src="${BANNER}" alt="火力全开 决胜2026">
+    <div class="sc-titlebar">
+      <div>
+        <div class="sc-t1">四季度达标冲刺目标卡</div>
+        <div class="sc-t2">聚力收官夺胜绩 · 颗粒归仓续新章</div>
       </div>
+      <div class="sc-q4">Q4</div>
     </div>
     <div class="sc-body">
-      <div class="sc-id">
-        <div class="sc-avatar">${esc((c.name||'·')[0])}</div>
-        <div class="sc-id-main">
-          <div class="sc-name">${esc(c.name||'')}<span class="sc-code">${esc(c.code||'')}</span></div>
-          <div class="sc-dept">${esc(c.dept||'')} · ${seq.name}</div>
-        </div>
-        ${c.status==='confirmed'?'<div class="sc-ok-tag">CONFIRMED</div>':''}
+      <div class="sc-info">
+        <div class="cell"><span>姓 名</span><b>${esc(c.name||'')}</b></div>
+        <div class="cell"><span>部 门</span><b>${esc(c.dept||'')}</b></div>
+        <div class="cell"><span>序 列</span><b>${esc(seq.name.replace('（PMO）',''))}</b></div>
       </div>
-      <div class="sc-sec">
-        <div class="sc-sec-label"><b>本季冲刺目标</b><span>GOALS</span></div>
-        ${goals.length?goals.map((g,i)=>`<div class="sc-goal"><div class="gno">${String(i+1).padStart(2,'0')}</div><p>${esc(g)}</p></div>`).join(''):'<div class="sc-goal"><div class="gno">01</div><p style="color:var(--muted)">待填写</p></div>'}
+      <div class="sc-sec-label"><b>本季度核心目标</b><span>GOALS</span><i>由部门经营目标倒推分解到人</i></div>
+      <div class="sc-gtable">
+        <div class="sc-ghead"><span class="h-no">序号</span><span class="h-t">目标项与目标值</span><span class="h-v">目标值</span></div>
+        ${items.map((it,i)=>`<div class="sc-grow">
+          <div class="gno">${String(i+1).padStart(2,'0')}</div>
+          <div class="gt">${esc(it.t)}${it.u?` <small style="font-weight:400;color:var(--muted);font-size:10.5px">（${esc(it.u)}）</small>`:''}</div>
+          <div class="gv ${it.v?'':'empty'}">${it.v?`${esc(it.v)}<i>${esc(it.u)}</i>`:'待 定'}</div>
+        </div>`).join('')}
       </div>
-      <div class="sc-sec">
-        <div class="sc-sec-label"><b>实施路径</b><span>PATH</span></div>
-        <div class="sc-path">
-          ${paths.length?paths.map(p=>`<div class="sc-step"><div class="pd"></div><p>${esc(p)}</p></div>`).join(''):'<div class="sc-step"><div class="pd"></div><p style="color:var(--muted)">待填写</p></div>'}
-        </div>
-      </div>
+      <div class="sc-words">「 ${esc(WORDS)} 」</div>
       <div class="sc-sign">
-        <div class="sc-sign-cell"><span>员工确认 / EMPLOYEE</span><b>${esc(c.name||'—')}</b><i>${c.submittedAt||'待提交'}</i></div>
-        <div class="sc-sign-cell"><span>部门负责人审核 / LEAD</span><b class="${c.status==='confirmed'?'':'pending'}">${c.status==='confirmed'?esc(c.confirmedBy||'负责人'):'待一对一确认'}</b><i>${c.confirmedAt||'—'}</i></div>
+        <div class="sc-sign-cell"><span>部门主管签发 / LEAD</span><b class="${c.status==='issued'?'':'pending'}">${c.status==='issued'?esc(c.issuedBy||'部门主管'):'待下发'}</b><i>${c.issuedAt||'无需员工回签'}</i></div>
+        <div class="sc-sign-cell" style="text-align:right"><span>下发状态</span><b class="${c.status==='issued'?'':'pending'}">${c.status==='issued'?'已下发到人':'填写中'}</b><i>${c.status==='issued'?'锁定 · 不可修改':'—'}</i></div>
       </div>
-      <div class="sc-foot"><span>${esc(c.code||'')} · Q4-2026 · SPRINT TRACKER</span><div class="sc-bar"></div></div>
+      <div class="sc-foot"><span>${esc(c.code||'')} · Q4-2026 · 达标冲刺</span><div class="sc-bar"></div></div>
     </div>
-    ${c.status==='confirmed'?sealSVG(c.confirmedAt):''}
+    ${c.status==='issued'?sealSVG(c.issuedAt):''}
   </div>`;
 }
 
-/* ============ 视图：我的冲刺卡 ============ */
+/* ============ 视图：我的冲刺卡（员工：只读查看） ============ */
 function renderCardView(){
-  const c=myCard();const p=person();const seq=seqOf(c.seq);
-  const editable=PERM.canEditCard();
+  const c=myCard();const p=person();
   const tl=[
-    {k:'draft',t:'填写目标卡',s:'选择序列 · 填写目标与路径',on:c.status==='draft',done:c.status!=='draft'},
-    {k:'sub',t:'一对一确认',s:'提交后与负责人当面确认',on:c.status==='submitted',done:c.status==='confirmed'},
-    {k:'ok',t:'负责人审核锁定',s:'确认后不可修改，可导出',on:c.status==='confirmed',done:c.status==='confirmed'},
+    {t:'部门主管填写',s:'按序列统一口径填目标值',done:!!(c.status==='draft'||c.status==='issued'),now:c.status==='draft'},
+    {t:'下发到人 · 锁定',s:'下发后自动可见，无需回签',done:c.status==='issued',now:false},
   ];
   let banner='';
-  if(c.status==='submitted')banner=`<div class="banner amber">${ic('bell')}<div><b>已提交，等待部门负责人一对一确认。</b>确认通过后目标卡将锁定，不可再修改；如需调整，请负责人退回后重新填写。</div></div>`;
-  if(c.status==='confirmed')banner=`<div class="banner ink">${ic('lock')}<div><b>目标卡已确认锁定，不可修改。</b>可随时导出图片或打印留存；季度末将作为冲刺复盘依据。</div></div>`;
-
+  if(c.status==='issued')banner=`<div class="banner ink">${ic('lock')}<div><b>目标卡已由部门主管下发并锁定。</b>无需回签；可导出图片或打印留存，季度末作为冲刺复盘依据。</div></div>`;
+  else if(c.status==='draft')banner=`<div class="banner amber">${ic('edit')}<div><b>主管（${esc(deptOf('impl').head)}）正在填写你的目标卡。</b>按公司规则：一人一卡、主管填写后直接下发到人，下发后此处自动可见，无需回签。</div></div>`;
+  else banner=`<div class="banner amber">${ic('edit')}<div><b>主管尚未开始填写你的目标卡。</b>按公司规则：一人一卡、主管填写后直接下发到人，下发后此处自动可见。</div></div>`;
   $('#view-card').innerHTML=`
   <div style="margin-bottom:16px">
-    <div class="sec-label">我的冲刺目标卡 <small>MY SPRINT CARD · ${esc(p.dept)}</small></div>
+    <div class="sec-label">我的达标冲刺目标卡 <small>MY SPRINT CARD · ${esc(p.dept)}</small></div>
     <div class="timeline">
-      ${tl.map((s,i)=>`<div class="tl-step ${s.done?'done':''} ${s.on?'now':''}"><div class="nd">${s.done?'✓':i+1}</div><b>${s.t}</b><small>${s.s}</small></div>`).join('')}
+      ${tl.map((s,i)=>`<div class="tl-step ${s.done?'done':''} ${s.now?'now':''}"><div class="nd">${s.done?'✓':i+1}</div><b>${s.t}</b><small>${s.s}</small></div>`).join('')}
     </div>
     ${banner}
   </div>
   <div class="card-layout">
+    <div class="panel form-panel" style="padding:20px 24px">
+      <div class="sec-label" style="margin-bottom:10px">卡片信息 <small>READ ONLY</small></div>
+      <div class="field"><label>序列</label><input class="ipt" value="${esc(seqOf(c.seq).name)}" disabled></div>
+      <div class="row2">
+        <div class="field"><label>姓名</label><input class="ipt" value="${esc(c.name)}" disabled></div>
+        <div class="field"><label>员工编码</label><input class="ipt" value="${esc(c.code)}" disabled></div>
+      </div>
+      <div class="field"><label>部门</label><input class="ipt" value="${esc(c.dept)}" disabled></div>
+      <div class="field"><label>本季度核心目标（目标项与目标值）</label>
+        <div style="border:1px solid var(--line-2);border-radius:9px;overflow:hidden">
+        ${cardItems(c).map((it,i)=>`<div style="display:flex;gap:10px;align-items:center;padding:8px 13px;${i?'border-top:1px solid var(--line);':''}background:${i%2?'#FBFAF8':'#fff'}">
+          <b style="color:var(--red);font-style:italic;font-size:13px;width:22px">${i+1}</b>
+          <span style="flex:1;font-size:12.5px;font-weight:600">${esc(it.t)} <small style="color:var(--muted);font-weight:400">（${esc(it.u)}）</small></span>
+          <b style="color:var(--red-deep);font-size:14px">${it.v?esc(it.v)+' '+esc(it.u):'<span style="color:#C9BFB4;font-weight:400;font-size:11px">待定</span>'}</b>
+        </div>`).join('')}
+        </div>
+        <div class="hint">目标值由部门年度及季度经营目标倒推分解到人，由主管统一填写下发。</div>
+      </div>
+      <div class="fill-guide">${ic('info','width:13px;height:13px;color:var(--red);vertical-align:-2px')} <b>规则说明</b>：一人一卡，由部门主管填写后直接下发到人，<b>无需员工回签</b>；每张卡填核心目标项，各序列使用统一口径。</div>
+    </div>
+    <div class="preview-wrap">
+      <div class="preview-tip">目标卡预览 · 下发后锁定</div>
+      <div id="card-preview">${cardHTML(S.persona,'me')}</div>
+      <div class="export-row">
+        <button class="btn ghost" onclick="App.exportPNG('me')" ${c.status==='issued'?'':'disabled'}>${ic('down')} 导出图片</button>
+        <button class="btn ghost" onclick="App.printCard('me')" ${c.status==='issued'?'':'disabled'}>${ic('print')} 打印 / PDF</button>
+      </div>
+      ${c.status!=='issued'?`<div class="preview-tip" style="color:var(--amber)">目标卡下发后开放导出</div>`:''}
+    </div>
+  </div>`;
+}
+
+/* ============ 视图：填写目标卡（负责人） ============ */
+function renderEditView(){
+  const id=S.editMember;const c=DB.cards[id];if(!c){S.route='review';return}
+  const seq=seqOf(c.seq);const editable=c.status!=='issued';
+  $('#view-edit').innerHTML=`
+  <div style="margin-bottom:16px">
+    <button class="btn ghost sm" onclick="App.go('review')">${ic('back')} 返回团队目标卡</button>
+  </div>
+  <div class="card-layout">
     <div class="panel form-panel">
+      <div class="sec-label" style="margin-bottom:12px">填写目标卡 · ${esc(c.name)} <small>一人一卡 · 统一口径</small></div>
       <div class="field">
-        <label>选择序列 <em>*</em></label>
+        <label>选择序列 <em>*</em>（目标项自动按官方对照表带出）</label>
         <div class="seq-grid">
           ${SEQ.map(s=>`<button class="seq-chip ${c.seq===s.id?'on':''}" ${editable?`onclick="App.pickSeq('${s.id}')"`:'disabled style="opacity:.55;cursor:not-allowed"'}>${ic(s.icon)}<div><b>${s.name}</b><i>${s.sub}</i></div></button>`).join('')}
         </div>
-        <div class="hint">${ic('info','width:12px;height:12px;vertical-align:-2px;color:var(--red)')} ${esc(seq.hint)}</div>
+        <div style="margin-top:7px"><button class="btn ghost xs" onclick="App.openCmp()">${ic('book')} 各序列核心目标项对照表</button></div>
       </div>
-      <div class="row2">
-        <div class="field"><label>姓名 <em>*</em></label><input class="ipt" id="f-name" value="${esc(c.name)}" ${editable?'':'disabled'} oninput="App.onFormInput()"></div>
-        <div class="field"><label>员工编码 <em>*</em></label><input class="ipt" id="f-code" value="${esc(c.code)}" ${editable?'':'disabled'} oninput="App.onFormInput()"></div>
-      </div>
-      <div class="field"><label>部门 <em>*</em></label><input class="ipt" id="f-dept" value="${esc(c.dept)}" ${editable?'':'disabled'} oninput="App.onFormInput()"></div>
-      <div class="field">
-        <label>本季冲刺目标 <em>*</em> <span style="font-weight:400;color:var(--muted);font-size:11.5px">（每行一个目标，建议 1–3 个）</span></label>
-        <textarea class="ipt" id="f-goals" rows="3" ${editable?'':'disabled'} oninput="App.onFormInput()" placeholder="${esc(seq.hint)}">${esc(c.goals)}</textarea>
+      ${seq.must?`<div class="must-note">${ic('info','width:13px;height:13px;vertical-align:-2px')} <b>销售序列必填</b>：1、本季度回款目标 XX 万元；2、本季度合同签约目标 XX 万元。</div>`:''}
+      <div class="row3">
+        <div class="field"><label>姓名 <em>*</em></label><input class="ipt" id="f-name" value="${esc(c.name)}" ${editable?'':'disabled'} oninput="App.onInfoInput()"></div>
+        <div class="field"><label>部门 <em>*</em></label><input class="ipt" id="f-dept" value="${esc(c.dept)}" ${editable?'':'disabled'} oninput="App.onInfoInput()"></div>
+        <div class="field"><label>员工编码</label><input class="ipt" id="f-code" value="${esc(c.code)}" ${editable?'':'disabled'} oninput="App.onInfoInput()"></div>
       </div>
       <div class="field">
-        <label>实施路径 <em>*</em> <span style="font-weight:400;color:var(--muted);font-size:11.5px">（达成目标的关键动作，按顺序排列）</span></label>
-        <div id="path-list">
-          ${(c.path&&c.path.length?c.path:['']).map((v,i)=>`
-          <div class="path-row"><div class="no">${i+1}</div>
-            <input class="ipt path-input" value="${esc(v)}" ${editable?'':'disabled'} oninput="App.onFormInput()" placeholder="例：里程碑倒排，周例会跟踪风险">
-            ${editable?`<button class="rm" title="删除" onclick="App.rmPath(${i})">${ic('trash')}</button>`:''}
-          </div>`).join('')}
-        </div>
-        ${editable?`<button class="btn ghost sm" style="margin-top:4px" onclick="App.addPath()">${ic('plus')} 添加路径</button>`:''}
-        ${c.savedAt?`<div class="hint">最近保存：${esc(c.savedAt)}</div>`:''}
+        <label>目标项与目标值 <em>*</em>（目标项为序列统一口径，填写目标值即可）</label>
+        ${cardItems(c).map((it,i)=>`
+        <div class="item-row">
+          <div class="no">${i+1}</div>
+          <div class="it-name">${esc(it.t)} <small>（${esc(it.u)}）</small></div>
+          <div class="uwrap"><input data-i="${i}" value="${esc(it.v)}" ${editable?`oninput="App.onItemInput(${i})"`:'disabled'} placeholder="目标值"><span>${esc(it.u)}</span></div>
+        </div>`).join('')}
+        <div class="hint">目标值由部门年度及季度经营目标倒推分解到人。</div>
       </div>
+      ${c.savedAt?`<div class="hint" style="margin-top:-6px">最近保存：${esc(c.savedAt)}</div>`:''}
+      <div class="fill-guide">${ic('info','width:13px;height:13px;color:var(--red);vertical-align:-2px')} <b>填写说明</b>：一人一卡，由部门主管填写后直接下发到人，<b>无需员工回签</b>；每张卡填核心目标，目标值由部门年度及季度经营目标倒推分解到人。</div>
       <div class="form-actions">
-        ${c.status==='draft'?`<button class="btn ghost" onclick="App.saveDraft()">${ic('edit')} 保存草稿</button>
-        <button class="btn red" onclick="App.submitCard()">${ic('send')} 提交负责人确认</button>`:
-        c.status==='submitted'?`<button class="btn" disabled>${ic('lock')} 已提交 · 待确认</button>`:
-        `<button class="btn" disabled>${ic('lock')} 已锁定 · 不可修改</button>`}
+        ${editable?`
+        <button class="btn ghost" onclick="App.saveDraft()">${ic('edit')} 保存草稿</button>
+        <button class="btn red" onclick="App.issueCard()">${ic('send')} 下发到人（锁定）</button>`:
+        `<button class="btn" disabled>${ic('lock')} 已下发 · 锁定不可修改</button>`}
       </div>
     </div>
     <div class="preview-wrap">
       <div class="preview-tip">目标卡实时预览 · EXPORTABLE</div>
-      <div id="card-preview">${cardHTML(S.persona,'me')}</div>
+      <div id="card-preview">${cardHTML(id,'me')}</div>
       <div class="export-row">
         <button class="btn ghost" onclick="App.exportPNG('me')">${ic('down')} 导出图片</button>
         <button class="btn ghost" onclick="App.printCard('me')">${ic('print')} 打印 / PDF</button>
       </div>
     </div>
+  </div>`;
+}
+
+/* ============ 视图：团队目标卡（负责人） ============ */
+function renderReview(){
+  const rows=DB.team.map(id=>({id,c:DB.cards[id]}));
+  const nIssued=rows.filter(r=>r.c.status==='issued').length;
+  const nDraft=rows.filter(r=>r.c.status==='draft').length;
+  const nBlank=rows.filter(r=>r.c.status==='blank').length;
+  $('#view-review').innerHTML=`
+  <div class="sec-label" style="margin-bottom:14px">团队目标卡 <small>TEAM CARDS · 主管填写，下发到人，无需回签</small></div>
+  <div class="sum-chips">
+    <div class="sum-chip"><i style="background:var(--red-deep)"></i><b>${nIssued}</b><span>已下发</span></div>
+    <div class="sum-chip"><i style="background:var(--amber)"></i><b>${nDraft}</b><span>填写中</span></div>
+    <div class="sum-chip"><i style="background:var(--line-2)"></i><b>${nBlank}</b><span>未填写</span></div>
+    <div class="sum-chip"><i style="background:var(--ink)"></i><b>${rows.length}</b><span>成员总数</span></div>
+  </div>
+  <div class="rev-list">
+  ${rows.map(({id,c})=>{
+    const st=c.status==='issued'?'<span class="pill confirmed"><span class="dot"></span>已下发</span>':
+      c.status==='draft'?'<span class="pill submitted"><span class="dot"></span>填写中</span>':'<span class="pill draft">未填写</span>';
+    const items=cardItems(c);
+    const peek=items.some(i=>i.v)?items.map(i=>i.v+i.u).join(' / '):'（尚未填写目标值）';
+    return `<div class="panel rev-row">
+      <div class="rv2">${esc((c.name||'?')[0])}</div>
+      <div class="rmain">
+        <b>${esc(c.name)}</b>&nbsp;&nbsp;${st}
+        <div class="rmeta"><span class="mono">${esc(c.code)}</span><span>${esc(seqOf(c.seq).name)}</span>${c.issuedAt?`<span>下发于 ${esc(c.issuedAt)}</span>`:c.savedAt?`<span>保存于 ${esc(c.savedAt)}</span>`:''}</div>
+        <div class="goal-peek">${esc(peek)}</div>
+      </div>
+      <div class="rev-actions">
+        ${c.status!=='issued'?`<button class="btn red xs" onclick="App.editMember('${id}')">${c.status==='blank'?'填写目标卡':'继续填写'}</button>`:
+        `<button class="btn ghost xs" onclick="App.openMember('${id}')">${ic('eye')} 查看</button>
+         <button class="btn danger xs" onclick="App.retractAsk('${id}')">撤回修改</button>`}
+      </div>
+    </div>`}).join('')}
   </div>`;
 }
 
@@ -672,6 +739,10 @@ function sparkSVG(vals){
   const pts=vals.map((v,i)=>`${(i/(n-1))*w},${h-2-(v/100)*(h-6)}`).join(' ');
   return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts}" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${w}" cy="${h-2-(vals[vals.length-1]/100)*(h-6)}" r="2.6" fill="var(--red)"/></svg>`;
 }
+function latestNote(d){
+  for(let k=S.selWeek;k>=1;k--){const w=d.weeks[k];if(w)return w.note}
+  return '暂无进展记录';
+}
 function renderBoard(){
   const p=person();
   const canSee=PERM.visibleDepts();
@@ -680,7 +751,7 @@ function renderBoard(){
   S.selDept=d.id;
   const editable=PERM.canEditBoard(d);
   let permBanner='';
-  if(p.role==='employee')permBanner=`<div class="banner ink">${ic('eye')}<div><b>只读视图。</b>你是部门员工，仅可查看本部门（${esc(p.dept)}）的目标进度看板。${d.id!==p.deptId?'当前部门无权查看。':''}</div></div>`;
+  if(p.role==='employee')permBanner=`<div class="banner ink">${ic('eye')}<div><b>只读视图。</b>你是部门员工，仅可查看本部门（${esc(p.dept)}）的目标进度看板。</div></div>`;
   else if(p.role==='bp')permBanner=`<div class="banner ink">${ic('eye')}<div><b>只读视图（BP 权限）。</b>可查看全部部门看板进度，不可填写；可在 BP 总览中发送提醒。</div></div>`;
   else permBanner=`<div class="banner red">${ic('edit')}<div><b>负责人视图。</b>你可以更新本部门每周进度、维护部门目标。</div></div>`;
 
@@ -715,7 +786,7 @@ function renderBoard(){
     </div>
     <div class="goal-grid">
       ${(d.goals||[]).map((g,gi)=>{
-        const cur=latestPct(d,S.selWeek,gi),prev=gi===0?0:0;
+        const cur=latestPct(d,S.selWeek,gi);
         const before=latestPct(d,S.selWeek-1,gi);
         const delta=cur-before;const dl=delta>0?`+${delta}pp`:'—';
         const hist=[];for(let k=1;k<=Math.min(S.selWeek,Q.current);k++)hist.push(latestPct(d,k,gi));
@@ -726,7 +797,7 @@ function renderBoard(){
             <span style="font-size:11px;color:var(--muted)">较上周</span></div>
           <div class="gc-bar"><div class="fill" style="width:${cur}%"></div>
             <i class="tick" style="left:25%"></i><i class="tick" style="left:50%"></i><i class="tick" style="left:75%"></i></div>
-          <div class="gc-note"><b>最新进展：</b>${esc(latestNote(d,gi))}</div>
+          <div class="gc-note"><b>最新进展：</b>${esc(latestNote(d))}</div>
           <div class="gc-spark">${sparkSVG(hist.length?hist:[0,0])}<small>近 ${hist.length||2} 周走势</small></div>
         </div>`}).join('')}
     </div>
@@ -738,7 +809,7 @@ function renderBoard(){
     <div class="panel week-panel">
       <div class="wp-head"><h3>${fmtW(S.selWeek)} 进展 <small>${wk.range} · ${wk.n===Q.current?'本周':wk.n<Q.current?'已归档':'未开始'}</small></h3>
         ${editableWeek&&!S.editWeek?`<button class="btn red sm" onclick="App.startWeekEdit()">${ic('edit')} 更新本周进度</button>`:''}
-        ${!editable&&wd?'':!wd&&S.selWeek<=Q.current?`<span class="pill submitted"><span class="dot"></span>待更新</span>`:''}
+        ${!wd&&S.selWeek<=Q.current?`<span class="pill submitted"><span class="dot"></span>待更新</span>`:''}
       </div>
       ${S.editWeek?renderWeekEditor(d):renderWeekDetail(d)}
     </div>`;
@@ -749,10 +820,6 @@ function renderBoard(){
     ${canSee.map(x=>`<button class="dtab ${x.id===d.id?'on':''}" onclick="App.pickDept('${x.id}')">${x.hasBoard?'<span class="dot"></span>':''}${esc(x.name)}${PERM.canEditBoard(x)?' · 可编辑':''}</button>`).join('')}
   </div>
   ${inner}`;
-}
-function latestNote(d,gi){
-  for(let k=S.selWeek;k>=1;k--){const w=d.weeks[k];if(w)return w.note}
-  return '暂无进展记录';
 }
 function renderWeekDetail(d){
   const wd=d.weeks[S.selWeek];
@@ -786,43 +853,6 @@ function renderWeekEditor(d){
   </div>`;
 }
 
-/* ============ 视图：团队审核（负责人） ============ */
-function renderReview(){
-  const rows=DB.team.map(id=>({id,c:DB.cards[id]}));
-  const nSub=rows.filter(r=>r.c.status==='submitted').length;
-  const nOk=rows.filter(r=>r.c.status==='confirmed').length;
-  const nBlank=rows.filter(r=>r.c.status==='blank'||r.c.status==='draft').length;
-  $('#view-review').innerHTML=`
-  <div class="sec-label" style="margin-bottom:14px">团队目标卡审核 <small>TEAM REVIEW · 一对一确认后锁定</small></div>
-  <div class="sum-chips">
-    <div class="sum-chip"><i style="background:var(--amber)"></i><b>${nSub}</b><span>待一对一确认</span></div>
-    <div class="sum-chip"><i style="background:var(--red-deep)"></i><b>${nOk}</b><span>已确认锁定</span></div>
-    <div class="sum-chip"><i style="background:var(--line-2)"></i><b>${nBlank}</b><span>未提交 / 草稿</span></div>
-    <div class="sum-chip"><i style="background:var(--ink)"></i><b>${rows.length}</b><span>成员总数</span></div>
-  </div>
-  <div class="rev-list">
-  ${rows.map(({id,c})=>{
-    const st=c.status==='submitted'?'<span class="pill submitted"><span class="dot"></span>待确认</span>':
-      c.status==='confirmed'?'<span class="pill confirmed"><span class="dot"></span>已锁定</span>':
-      c.status==='draft'?'<span class="pill draft">草稿中</span>':'<span class="pill draft">未开始</span>';
-    const peek=goalsOf(c)[0]||'（尚未填写目标）';
-    return `<div class="panel rev-row">
-      <div class="rv2">${esc((c.name||'?')[0])}</div>
-      <div class="rmain">
-        <b>${esc(c.name)}</b>&nbsp;&nbsp;${st}
-        <div class="rmeta"><span class="mono">${esc(c.code)}</span><span>${esc(seqOf(c.seq).name)}</span>${c.submittedAt?`<span>提交于 ${esc(c.submittedAt)}</span>`:''}${c.confirmedAt?`<span>确认于 ${esc(c.confirmedAt)}</span>`:''}</div>
-        <div class="goal-peek">${esc(peek)}</div>
-      </div>
-      <div class="rev-actions">
-        <button class="btn ghost xs" onclick="App.openMember('${id}')">${ic('eye')} 查看目标卡</button>
-        ${c.status==='submitted'?`
-        <button class="btn red xs" onclick="App.confirmAsk('${id}')">${ic('shield')} 确认锁定</button>
-        <button class="btn danger xs" onclick="App.rejectAsk('${id}')">退回</button>`:''}
-      </div>
-    </div>`}).join('')}
-  </div>`;
-}
-
 /* ============ 视图：BP 总览 ============ */
 function renderBP(){
   const impl=deptOf('impl');
@@ -833,15 +863,15 @@ function renderBP(){
   <div class="sec-label" style="margin-bottom:14px">BP 总览 · 全公司冲刺进度 <small>OVERVIEW</small></div>
   <div class="stat-grid">
     <div class="panel stat"><div class="st-label">${ic('users')}参与人数</div><div class="st-num">${t}<small> 人</small></div><div class="st-sub">覆盖 10 个序列部门</div></div>
-    <div class="panel stat"><div class="st-label">${ic('shield')}目标卡确认率</div><div class="st-num">${Math.round(c/t*100)}<small> %</small></div>
-      <div class="mini-bar"><i style="width:${c/t*100}%"></i></div><div class="st-sub">已确认 ${c} / ${t} 人</div></div>
+    <div class="panel stat"><div class="st-label">${ic('shield')}目标卡下发率</div><div class="st-num">${Math.round(c/t*100)}<small> %</small></div>
+      <div class="mini-bar"><i style="width:${c/t*100}%"></i></div><div class="st-sub">已下发 ${c} / ${t} 人</div></div>
     <div class="panel stat"><div class="st-label">${ic('board')}看板开设</div><div class="st-num">${boards.length}<small> / ${DB.depts.length}</small></div><div class="st-sub">部门进度看板</div></div>
     <div class="panel stat"><div class="st-label">${ic('cal')}本周更新及时</div><div class="st-num">${timely}<small> / ${boards.length}</small></div>
       <div class="mini-bar"><i style="width:${boards.length?timely/boards.length*100:0}%"></i></div><div class="st-sub">截至 ${esc(impl.lastAt)}</div></div>
   </div>
   <div class="panel" style="overflow:hidden">
     <table class="bp">
-      <thead><tr><th>部门</th><th>负责人</th><th style="width:220px">目标卡确认进度</th><th>看板最近更新</th><th style="width:170px">操作</th></tr></thead>
+      <thead><tr><th>部门</th><th>负责人</th><th style="width:220px">目标卡下发进度</th><th>看板最近更新</th><th style="width:170px">操作</th></tr></thead>
       <tbody>
       ${DB.depts.map(d=>`<tr>
         <td><b>${esc(d.name)}</b></td>
@@ -861,15 +891,16 @@ function renderBP(){
 /* ============ 侧栏 / 顶栏 ============ */
 function renderNav(){
   const p=person();
+  const nPending=DB.team.filter(id=>DB.cards[id].status!=='issued').length;
   const items=[
     {r:'card',icon:'card',t:'我的冲刺卡',show:true},
     {r:'board',icon:'board',t:'部门进度看板',show:true},
-    {r:'review',icon:'shield',t:'团队审核',show:p.role==='head',bdg:DB.team.filter(id=>DB.cards[id].status==='submitted').length},
+    {r:'review',icon:'shield',t:'团队目标卡',show:p.role==='head',bdg:nPending||''},
     {r:'bp',icon:'chart',t:'BP 总览',show:p.role==='bp'},
   ].filter(i=>i.show);
   const groups=[{g:'目标卡',from:0,to:1},{g:'看板 · 管理',from:1,to:items.length}];
   $('#nav').innerHTML=groups.map(gr=>`<div class="nav-group"><i>${gr.g}</i>
-    ${items.slice(gr.from,gr.to).map(i=>`<button class="nav-item ${S.route===i.r?'active':''}" onclick="App.go('${i.r}')">${ic(i.icon)}<span>${i.t}</span>${i.bdg?`<span class="bdg">${i.bdg}</span>`:''}</button>`).join('')}
+    ${items.slice(gr.from,gr.to).map(i=>`<button class="nav-item ${S.route===i.r||S.route==='edit'&&i.r==='review'?'active':''}" onclick="App.go('${i.r}')">${ic(i.icon)}<span>${i.t}</span>${i.bdg?`<span class="bdg">${i.bdg}</span>`:''}</button>`).join('')}
   </div>`).join('');
 }
 function renderPersonas(){
@@ -878,9 +909,15 @@ function renderPersonas(){
       <span class="pv">${esc(p.name[0])}</span><div><div style="font-size:12.5px;font-weight:600;color:inherit">${esc(p.name)}</div><small>${esc(p.roleName)} · ${esc(p.dept)}</small></div>
     </button>`).join('');
 }
-const ROUTE_TITLES={card:['我的冲刺目标卡','填写 → 一对一确认 → 负责人锁定'],board:['部门目标进度看板','部门负责人每周更新，部门成员可见'],review:['团队目标卡审核','与成员一对一确认后锁定，锁定不可修改'],bp:['BP 总览','全公司冲刺确认率与看板更新情况']};
+const ROUTE_TITLES={
+ card:['我的达标冲刺目标卡','部门主管填写后直接下发到人 · 无需员工回签'],
+ board:['部门目标进度看板','部门负责人每周更新，部门成员可见'],
+ review:['团队目标卡','一人一卡 · 主管填写下发 · 下发后锁定'],
+ edit:['填写目标卡','按序列统一口径填写目标值，下发后锁定'],
+ bp:['BP 总览','全公司目标卡下发率与看板更新情况']};
 function renderTopbar(){
-  const p=person();const[title,sub]=ROUTE_TITLES[S.route]||['',''];
+  const p=person();let[title,sub]=ROUTE_TITLES[S.route]||['',''];
+  if(S.route==='edit'&&S.editMember){const c=DB.cards[S.editMember];title=`填写目标卡 · ${c.name}`;sub='按序列统一口径填写目标值，下发后锁定'}
   $('#topbar').innerHTML=`
     <div><h1>${title}</h1><div class="crumb">${sub}</div></div>
     <div class="topbar-right">
@@ -893,17 +930,19 @@ function renderTopbar(){
 /* ============ 主渲染 ============ */
 function render(){
   const p=person();
-  if(S.route==='review'&&!PERM.canReview())S.route='card';
+  if(S.route==='review'&&!PERM.canTeam())S.route='card';
+  if(S.route==='edit'&&!PERM.canTeam())S.route='card';
   if(S.route==='bp'&&!PERM.canBP())S.route='card';
-  ['card','board','review','bp'].forEach(r=>{
-    const el=$('#view-'+r);el.classList.toggle('on',S.route===r);
+  ['card','board','review','edit','bp'].forEach(r=>{
+    $('#view-'+r).classList.toggle('on',S.route===r);
   });
   renderNav();renderPersonas();renderTopbar();
   if(S.route==='card')renderCardView();
   if(S.route==='board')renderBoard();
   if(S.route==='review')renderReview();
+  if(S.route==='edit')renderEditView();
   if(S.route==='bp')renderBP();
-  const hash={card:'#/card',board:'#/board',review:'#/review',bp:'#/bp'}[S.route];
+  const hash={card:'#/card',board:'#/board',review:'#/review',edit:'#/review',bp:'#/bp'}[S.route];
   if(location.hash!==hash)history.replaceState(null,'',hash);
 }
 
@@ -915,42 +954,88 @@ function closeModal(){$('#modal-root').classList.remove('on');$('#modal-root').i
 const App={
   go(r){S.route=r;if(r==='board')S.editWeek=false;render()},
   switchPersona(id){S.persona=id;S.route='card';S.editWeek=false;const p=DB.people[id];S.selDept=p.deptId;S.selWeek=Q.current;render();toast(`已切换为 ${p.name}（${p.roleName}），权限已同步`)},
-  pickSeq(id){const c=myCard();if(c.status!=='draft')return;c.seq=id;renderCardView()},
-  onFormInput(){
-    const c=myCard();if(c.status!=='draft')return;
-    c.name=$('#f-name').value.trim();c.code=$('#f-code').value.trim();c.dept=$('#f-dept').value.trim();
-    c.goals=$('#f-goals').value;
-    c.path=[...document.querySelectorAll('.path-input')].map(i=>i.value);
-    $('#card-preview').innerHTML=cardHTML(S.persona,'me');
+  /* ---- 填写目标卡（负责人） ---- */
+  editMember(id){S.editMember=id;S.route='edit';render()},
+  pickSeq(id){
+    const c=DB.cards[S.editMember];if(!c||c.status==='issued')return;
+    if(c.seq!==id){c.seq=id;c.items=seqOf(id).items.map(()=>({v:''}));}
+    renderEditView();
   },
-  addPath(){const c=myCard();c.path.push('');renderCardView();const list=$('#path-list');const inputs=list.querySelectorAll('.path-input');inputs[inputs.length-1].focus()},
-  rmPath(i){const c=myCard();if(c.path.length<=1){c.path=['']}else{c.path.splice(i,1)}renderCardView()},
-  saveDraft(){App.onFormInput();const c=myCard();c.savedAt='刚刚';save();renderCardView();toast('草稿已保存')},
-  submitCard(){
-    App.onFormInput();const c=myCard();
-    if(!c.name||!c.code||!c.dept){toast('请填写姓名、员工编码与部门',1);return}
-    if(!goalsOf(c).length){toast('请至少填写一个冲刺目标',1);return}
-    if(!pathsOf(c).length){toast('请至少填写一条实施路径',1);return}
-    openModal(`<div class="modal" style="max-width:430px"><div class="modal-pad">
-      <h3 style="font-size:16px;margin-bottom:10px">提交部门负责人确认</h3>
-      <p style="font-size:13.5px;color:var(--ink-2);line-height:1.8">提交后目标卡进入<b>「一对一确认」</b>环节，请与部门负责人（${esc(deptOf('impl').head)}）当面确认目标与路径。<br>确认通过前仍可退回修改。</p>
+  onInfoInput(){
+    const c=DB.cards[S.editMember];if(!c||c.status==='issued')return;
+    c.name=$('#f-name').value.trim();c.dept=$('#f-dept').value.trim();c.code=$('#f-code').value.trim();
+    $('#card-preview').innerHTML=cardHTML(S.editMember,'me');
+  },
+  onItemInput(i){
+    const c=DB.cards[S.editMember];if(!c||c.status==='issued')return;
+    const inp=document.querySelector(`.item-row input[data-i="${i}"]`);
+    c.items[i]={v:inp.value.trim()};
+    $('#card-preview').innerHTML=cardHTML(S.editMember,'me');
+  },
+  saveDraft(){
+    const c=DB.cards[S.editMember];if(!c)return;
+    if(c.status==='blank')c.status='draft';
+    c.savedAt='刚刚';save();renderEditView();renderNav();toast('草稿已保存，可稍后下发');
+  },
+  issueCard(){
+    const c=DB.cards[S.editMember];if(!c)return;
+    const items=cardItems(c);
+    if(!items.some(i=>i.v)){toast('请至少填写一个目标值',1);return}
+    openModal(`<div class="modal" style="max-width:440px"><div class="modal-pad">
+      <h3 style="font-size:16px;margin-bottom:10px">下发目标卡给 ${esc(c.name)}？</h3>
+      <p style="font-size:13.5px;color:var(--ink-2);line-height:1.8">按公司规则：<b>由部门主管填写后直接下发到人，无需员工回签</b>。下发后目标卡<b style="color:var(--red-deep)">立即锁定</b>，${esc(c.name)} 在「我的冲刺卡」中可见并可导出；如需调整须先撤回。</p>
       <div class="modal-actions" style="padding:16px 0 0;border:none">
         <button class="btn ghost sm" onclick="App.closeModal()">再想想</button>
-        <button class="btn red sm" onclick="App.doSubmit()">${ic('send')} 确认提交</button>
+        <button class="btn red sm" onclick="App.doIssue()">${ic('send')} 确认下发</button>
       </div></div></div>`);
   },
-  doSubmit(){const c=myCard();c.status='submitted';c.submittedAt='刚刚';c.savedAt='刚刚';save();closeModal();renderCardView();renderNav();toast('已提交，等待部门负责人一对一确认')},
+  doIssue(){
+    const c=DB.cards[S.editMember];c.status='issued';c.issuedAt='刚刚';c.issuedBy=person().name;
+    save();closeModal();S.route='review';render();toast(`目标卡已下发 ${c.name}，锁定生效`);
+  },
+  retractAsk(id){
+    const c=DB.cards[id];
+    openModal(`<div class="modal" style="max-width:430px"><div class="modal-pad">
+      <h3 style="font-size:16px;margin-bottom:10px">撤回 ${esc(c.name)} 的目标卡？</h3>
+      <p style="font-size:13.5px;color:var(--ink-2);line-height:1.8">撤回后卡片解锁回到「填写中」，员工端暂时不可见，可调整目标值后重新下发。</p>
+      <div class="modal-actions" style="padding:16px 0 0;border:none">
+        <button class="btn ghost sm" onclick="App.closeModal()">取消</button>
+        <button class="btn sm" onclick="App.doRetract('${id}')">确认撤回</button>
+      </div></div></div>`);
+  },
+  doRetract(id){const c=DB.cards[id];c.status='draft';c.issuedAt='';save();closeModal();render();toast(`已撤回 ${c.name} 的目标卡，可重新编辑`)},
+  openMember(id){
+    const c=DB.cards[id];
+    openModal(`<div class="modal" style="width:560px"><div class="modal-head"><h3>目标卡 · ${esc(c.name)}（已下发）</h3>
+      <button class="x" onclick="App.closeModal()">${ic('x')}</button></div>
+      <div class="modal-card-zone">${cardHTML(id,'mv'+id)}</div>
+      <div class="modal-actions">
+        <button class="btn ghost sm" onclick="App.exportPNG('mv${id}')">${ic('down')} 导出图片</button>
+        <button class="btn danger sm" onclick="App.doRetract('${id}')">撤回修改</button>
+      </div></div>`);
+  },
+  openCmp(){
+    openModal(`<div class="modal" style="max-width:640px"><div class="modal-head"><h3>各序列本季度核心目标项对照表</h3><button class="x" onclick="App.closeModal()">${ic('x')}</button></div>
+    <div class="modal-pad">
+      <p class="hint" style="margin:0 0 12px">下列目标项为各序列统一口径，<b style="color:var(--ink)">同序列使用同一套目标项与计量单位</b>；销售序列两项必填。</p>
+      <table class="cmp-table">
+        <tr><th>序列</th><th>核心目标项</th></tr>
+        ${SEQ.map(s=>`<tr><td>${s.name}</td><td>${s.items.map((it,i)=>`${i+1}　${esc(it.t)}（${esc(it.u)}）`).join('；<br>')}</td></tr>`).join('')}
+      </table>
+    </div></div>`);
+  },
+  /* ---- 导出 / 打印 ---- */
   exportPNG(uid){
     const el=document.getElementById('scard-'+uid);
-    if(!el){toast('暂无可导出的目标卡',1);return}
+    if(!el||el.classList.contains('empty-state')){toast('暂无可导出的目标卡',1);return}
     if(typeof html2canvas==='undefined'){toast('导出组件未加载（离线），已为你打开打印',1);App.printCard(uid);return}
     html2canvas(el,{scale:2,useCORS:true,backgroundColor:null}).then(cv=>{
-      const a=document.createElement('a');const name=(myCard().name||'成员');
-      a.download=`冲刺目标卡-${name}-2026Q4.png`;a.href=cv.toDataURL('image/png');a.click();toast('目标卡图片已导出');
+      const a=document.createElement('a');const c=DB.cards[S.editMember&&uid==='me'?S.editMember:S.persona];
+      a.download=`达标冲刺目标卡-${c.name||'成员'}-2026Q4.png`;a.href=cv.toDataURL('image/png');a.click();toast('目标卡图片已导出');
     }).catch(()=>{toast('导出失败，已为你打开打印',1);App.printCard(uid)});
   },
   printCard(uid){
-    const el=document.getElementById('scard-'+uid);if(!el){toast('暂无可打印的目标卡',1);return}
+    const el=document.getElementById('scard-'+uid);if(!el||el.classList.contains('empty-state')){toast('暂无可打印的目标卡',1);return}
     const m=$('#printMount');m.innerHTML='';m.appendChild(el.cloneNode(true));
     document.body.classList.add('printing');
     const done=()=>{document.body.classList.remove('printing');m.innerHTML='';window.removeEventListener('afterprint',done)};
@@ -994,41 +1079,6 @@ const App={
     d.goals=[g1,g2];d.path=$('#ed-path').value.split('\n').map(s=>s.trim()).filter(Boolean);
     d.hasBoard=true;save();closeModal();render();toast('部门目标已保存，看板已生成');
   },
-  /* ---- 审核 ---- */
-  openMember(id){
-    const c=DB.cards[id];const canConfirm=c.status==='submitted'&&PERM.canReview();
-    openModal(`<div class="modal" style="width:560px"><div class="modal-head"><h3>目标卡 · ${esc(c.name)}</h3>
-      <button class="x" onclick="App.closeModal()">${ic('x')}</button></div>
-      <div class="modal-card-zone">${cardHTML(id,'mv'+id)}</div>
-      <div class="modal-actions">
-        <button class="btn ghost sm" onclick="App.exportPNG('mv${id}')">${ic('down')} 导出图片</button>
-        ${canConfirm?`
-        <button class="btn danger sm" onclick="App.rejectAsk('${id}')">退回修改</button>
-        <button class="btn red sm" onclick="App.confirmAsk('${id}')">${ic('shield')} 确认并锁定</button>`:''}
-      </div></div>`);
-  },
-  confirmAsk(id){
-    const c=DB.cards[id];
-    openModal(`<div class="modal" style="max-width:430px"><div class="modal-pad">
-      <h3 style="font-size:16px;margin-bottom:10px">确认锁定 ${esc(c.name)} 的目标卡？</h3>
-      <p style="font-size:13.5px;color:var(--ink-2);line-height:1.8">请确认已与本人<b>一对一沟通</b>并对目标达成一致。锁定后该目标卡<b style="color:var(--red-deep)">双方均不可修改</b>，作为本季度冲刺与复盘依据。</p>
-      <div class="modal-actions" style="padding:16px 0 0;border:none">
-        <button class="btn ghost sm" onclick="App.closeModal()">取消</button>
-        <button class="btn red sm" onclick="App.doConfirm('${id}')">${ic('lock')} 确认锁定</button>
-      </div></div></div>`);
-  },
-  doConfirm(id){const c=DB.cards[id];c.status='confirmed';c.confirmedAt='刚刚';c.confirmedBy=person().name;save();closeModal();render();toast(`${c.name} 的目标卡已确认锁定，盖章生效`)},
-  rejectAsk(id){
-    const c=DB.cards[id];
-    openModal(`<div class="modal" style="max-width:430px"><div class="modal-pad">
-      <h3 style="font-size:16px;margin-bottom:10px">退回 ${esc(c.name)} 的目标卡</h3>
-      <div class="field"><label>退回意见（可选）</label><textarea class="ipt" id="rj-note" rows="2" placeholder="例：目标请再量化，路径补充回款动作"></textarea></div>
-      <div class="modal-actions" style="padding:10px 0 0;border:none">
-        <button class="btn ghost sm" onclick="App.closeModal()">取消</button>
-        <button class="btn sm" onclick="App.doReject('${id}')">确认退回</button>
-      </div></div></div>`);
-  },
-  doReject(id){const c=DB.cards[id];c.status='draft';c.submittedAt='';save();closeModal();render();toast(`已退回 ${c.name} 修改，退回意见已通知本人`)},
   /* ---- BP ---- */
   viewDeptBoard(id){S.selDept=id;S.selWeek=Q.current;App.go('board')},
   remind(head){toast(`已向 ${head} 发送填写 / 更新提醒（演示）`)},
@@ -1038,27 +1088,26 @@ const App={
     <div class="modal-pad">
       <table class="matrix">
         <tr><th style="text-align:left">功能</th><th>员工</th><th>部门负责人</th><th>BP / 人力</th></tr>
-        <tr><td>填写个人冲刺卡</td><td class="y">✓ 本人（确认前）</td><td class="y">✓ 本人（确认前）</td><td class="y">✓ 本人（确认前）</td></tr>
-        <tr><td>审核 · 锁定成员目标卡</td><td class="n">—</td><td class="y">✓ 本部门</td><td class="n">—</td></tr>
+        <tr><td>查看本人目标卡</td><td class="p">下发后只读 · 可导出</td><td class="y">✓</td><td class="y">✓</td></tr>
+        <tr><td>填写 · 下发成员目标卡</td><td class="n">—</td><td class="y">✓ 本部门</td><td class="n">—</td></tr>
         <tr><td>查看部门进度看板</td><td class="p">仅本部门 · 只读</td><td class="y">✓ 本部门 · 可编辑</td><td class="y">✓ 全部 · 只读</td></tr>
         <tr><td>填写部门目标（部门/负责人/目标1/目标2/路径）</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td></tr>
         <tr><td>每周更新部门进度</td><td class="n">—</td><td class="y">✓</td><td class="n">—</td></tr>
         <tr><td>全公司统计与提醒</td><td class="n">—</td><td class="n">—</td><td class="y">✓</td></tr>
         <tr><td>目标卡导出（PNG / 打印）</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
       </table>
-      <p class="hint" style="margin-top:12px">锁定规则：部门负责人审核确认后，员工与负责人双方均不可修改；退回后员工可重新填写再提交。</p>
+      <p class="hint" style="margin-top:12px">规则：一人一卡，由部门主管填写后直接下发到人，无需员工回签；下发后锁定，双方不可修改，撤回后可重新编辑。</p>
     </div></div>`);
   },
   openGuide(){
     openModal(`<div class="modal" style="max-width:520px"><div class="modal-head"><h3>原型演示指引</h3><button class="x" onclick="App.closeModal()">${ic('x')}</button></div>
     <div class="modal-pad"><ol class="guide">
       <li><b>左下角切换演示身份</b>：员工 张明 / 部门负责人 李强 / BP 王芳，左侧菜单与操作权限随之变化。</li>
-      <li><b>员工</b>：在「我的冲刺卡」选择序列、填写目标与路径 → 点击「提交负责人确认」。</li>
-      <li><b>负责人</b>：切到「团队审核」查看成员目标卡 → 与成员一对一确认后「确认锁定」，锁定后双方不可修改（卡片盖章）。</li>
-      <li><b>负责人</b>：在「部门进度看板」设置部门目标（部门 / 负责人 / 目标1 / 目标2 / 路径），并<b>每周更新进度</b>。</li>
+      <li><b>负责人</b>：「团队目标卡」→ 点击成员「填写目标卡」→ 选择序列（目标项按官方对照表自动带出）→ 填写目标值 →「下发到人」。下发后卡片盖章锁定，<b>无需员工回签</b>。</li>
+      <li><b>员工</b>：「我的冲刺卡」只读查看主管下发的目标卡（下发前不可见），可导出 PNG / 打印。</li>
+      <li><b>负责人</b>：「部门进度看板」设置部门目标（部门 / 负责人 / 目标1 / 目标2 / 路径），并<b>每周更新进度</b>。</li>
       <li><b>员工</b>：看板为只读，且只能看到本部门进度。</li>
-      <li><b>BP</b>：「BP 总览」查看全公司确认率、看板更新情况并发送提醒。</li>
-      <li><b>导出</b>：冲刺卡支持导出 PNG 图片与打印 / PDF。</li>
+      <li><b>BP</b>：「BP 总览」查看全公司目标卡下发率、看板更新情况并发送提醒。</li>
     </ol></div></div>`);
   },
   reset(){localStorage.removeItem(LSKEY);location.href=location.pathname+'#/card';location.reload()},
@@ -1073,9 +1122,11 @@ load();
   if(['card','board','review','bp'].includes(h))S.route=h;
   const q=new URLSearchParams(location.search).get('p');
   if(q&&DB.people[q])S.persona=q;
+  const m=new URLSearchParams(location.search).get('m');
+  if(m&&DB.cards[m]&&person().role==='head'){S.editMember=m;S.route='edit'}
   const p=person();S.selDept=p.deptId;
   render();
-  setTimeout(()=>toast('原型已就绪：左下角可切换 员工 / 负责人 / BP 三种身份体验权限'),600);
+  setTimeout(()=>toast('原型已更新为官方《四季度达标冲刺目标卡》模板'),600);
 })();
 </script>
 </body>
