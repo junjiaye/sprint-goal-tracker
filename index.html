@@ -346,13 +346,16 @@ td .mono{font-family:var(--mono);font-size:12px;color:var(--muted)}
   body.printing #printMount .scard{box-shadow:none;border:none}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* 两栏（表单470+卡片460+侧栏228+边距）至少需约1250px，更窄时切单栏，避免预览列被压窄导致错位 */
+@media (max-width:1250px){
+  .card-layout{grid-template-columns:1fr}
+  .preview-wrap{position:static}
+}
 @media (max-width:1120px){
   #app{grid-template-columns:64px 1fr}
   .side-logo b,.side-logo i,.nav-group>i,.nav-item span,.nav-item .bdg,.side-persona>i,.persona small,.side-tools{display:none}
   .nav-item{justify-content:center;padding:11px 0}
   .persona{justify-content:center;padding:8px 0}
-  .card-layout{grid-template-columns:1fr}
-  .preview-wrap{position:static}
   .goal-grid,.wp-grid{grid-template-columns:1fr}
   .stat-grid{grid-template-columns:1fr 1fr}
 }
